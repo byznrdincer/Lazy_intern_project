@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Verify Company Email | SmartIntern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    :root{ --border:#e6eaf2; --ring:rgba(16,24,40,.08); }
+    .card-soft{ border:1px solid var(--border); border-radius:16px; background:#fff; box-shadow:0 18px 48px -24px var(--ring); }
+  </style>
+</head>
+<body class="bg-light">
+
+<div class="container py-5" style="max-width:760px">
+  <h1 class="h4 mb-3">Verify Company Email</h1>
+  <p class="text-muted mb-4">Company: <strong>{{ company.name }}</strong></p>
+
+  {% if messages %}
+    <div class="mb-3">
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags|default:'info' }} mb-2">{{ m }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- 1) Kod Gönderme -->
+  <div class="card-soft p-4 mb-4">
+    <h5 class="fw-bold">1) Send a code</h5>
+    <form method="post" action="{% url 'company_send_verification_code' slug=company.slug %}" class="row g-2 mt-2">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+      <div class="col-md-8">
+        <input type="email" name="verification_email" class="form-control" placeholder="name@company.com"
+               value="{{ company.contact_email|default:company.user.email }}">
+      </div>
+      <div class="col-md-4 d-grid">
+        <button class="btn btn-primary" type="submit">Send code</button>
+      </div>
+    </form>
+    <div class="form-text mt-1">The code is valid for {{ ttl_minutes|default:'10' }} minutes.</div>
+  </div>
+
+  <!-- 2) Kod Doğrulama -->
+  <div class="card-soft p-4">
+    <h5 class="fw-bold">2) Enter the code</h5>
+    <form method="post" action="{% url 'company_email_verify' slug=company.slug %}" class="row g-2 mt-2">
+      {% csrf_token %}
+      <input type="hidden" name="verify_code_submit" value="1">
+      <input type="hidden" name="next" value="{{ request.GET.next|default:'' }}">
+      <div class="col-md-8">
+        <input type="text" name="code" maxlength="6" class="form-control" placeholder="6-digit code">
+      </div>
+      <div class="col-md-4 d-grid">
+        <button class="btn btn-success" type="submit">Verify</button>
+      </div>
+    </form>
+    {% if company.is_verified %}
+      <div class="alert alert-success mt-3 mb-0">Already verified ✅</div>
+    {% endif %}
+  </div>
+
+  <div class="mt-4">
+    <a class="btn btn-outline-secondary" href="{% url 'company_profile' company.slug %}">
+      Back to company dashboard
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

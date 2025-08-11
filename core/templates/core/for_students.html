@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>For Students</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap kalsın -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* ===== Theme Tokens (lazyIntern görünümü) ===== */
+    :root{
+      --bg:#ffffff; --text:#0b1324; --muted:#5b6b7a;
+      --blue-50:#eef4ff; --teal-50:#ecfdfa;
+      --blue-600:#2563eb; --teal-600:#0ca678; --purple-600:#7c3aed; --green-600:#16a34a; --yellow-600:#ca8a04;
+      --ring:rgba(37,99,235,.16); --card:#fff; --border:#eef2f7;
+    }
+    html,body{height:100%;}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, var(--blue-50), transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, var(--teal-50), transparent 60%),
+        var(--bg);
+    }
+    .container-narrow{max-width:1100px; margin:0 auto; padding:0 16px;}
+
+    /* ===== Hero (gradient + büyük başlık) ===== */
+    .hero{
+      padding: clamp(64px, 8vw, 120px) 0 40px;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(12,166,120,0.06) 100%);
+    }
+    .hero h1{
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight:900; letter-spacing:-.4px; margin:0 0 12px;
+    }
+    .grad-text{
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .hero p{
+      max-width:900px; margin:0 auto 22px; font-size: clamp(16px, 2.2vw, 20px); color:var(--muted);
+    }
+    .btn-hero{
+      display:inline-block; border:none; font-weight:800; color:#fff; text-decoration:none;
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      padding:12px 26px; border-radius:12px;
+      box-shadow:0 16px 44px -18px var(--ring);
+    }
+    .btn-hero:hover{filter:brightness(1.05); transform:translateY(-1px);}
+
+    /* ===== Section titles ===== */
+    .section-title{
+      text-align:center; font-weight:900; letter-spacing:-.3px;
+      font-size: clamp(24px, 3.2vw, 34px); margin: 56px 0 8px;
+    }
+    .section-sub{text-align:center; color:var(--muted); margin:-2px 0 26px;}
+
+    /* ===== Sol listeli faydalar + sağ küçük kartlar ===== */
+    .check-item{display:flex; gap:10px; align-items:flex-start;}
+    .check-icon{
+      flex:0 0 28px; height:28px; width:28px; border-radius:999px; display:grid; place-items:center; color:#fff;
+      background:linear-gradient(135deg, #22c55e, var(--green-600)); font-size:16px; line-height:1;
+      box-shadow:0 10px 26px -14px var(--ring);
+    }
+    .mini-cards{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+    .mini-card{
+      border:1px solid var(--border); border-radius:16px; background:#fff; text-align:center; padding:18px;
+      box-shadow:0 12px 36px -18px var(--ring);
+    }
+    .mini-icon{
+      height:48px; width:48px; border-radius:12px; margin:0 auto 10px; color:#fff; display:grid; place-items:center;
+      background:linear-gradient(135deg, var(--blue-600), var(--teal-600));
+      box-shadow:0 10px 30px -14px var(--ring); font-size:22px;
+    }
+    .mini-card h3{font-size:16px; font-weight:800; margin-bottom:4px;}
+    .mini-card p{margin:0; color:var(--muted); font-size:14px;}
+
+    /* ===== 3 büyük içerik kartı ===== */
+    .grid-3{display:grid; gap:18px; grid-template-columns:1fr; }
+    @media(min-width:768px){ .grid-3{ grid-template-columns:repeat(3, 1fr);} }
+    .cardx{
+      border:1px solid var(--border); border-radius:18px; background:var(--card); padding:22px;
+      box-shadow:0 14px 42px -18px var(--ring);
+    }
+    .cardx h3{font-size:18px; font-weight:800; display:flex; align-items:center; gap:8px; margin-bottom:8px;}
+    .cardx ul{margin:0; padding-left:1rem; color:var(--muted);}
+    .pill{
+      height:40px; width:40px; border-radius:12px; display:grid; place-items:center; color:#fff;
+      background:linear-gradient(135deg, var(--blue-600), var(--teal-600));
+    }
+
+    /* ===== 2 geniş alıntı kartı ===== */
+    .grid-2{display:grid; gap:18px; grid-template-columns:1fr;}
+    @media(min-width:768px){ .grid-2{ grid-template-columns:repeat(2,1fr);} }
+    .quote-card{
+      border:1px solid var(--border); border-radius:18px; background:linear-gradient(135deg, #eff6ff, #e0f2fe);
+      box-shadow:0 14px 42px -18px var(--ring); padding:22px;
+    }
+    .quote-card.teal{ background:linear-gradient(135deg, #ecfdfa, #d2f4ea); }
+    .quote-head{display:flex; align-items:center; gap:12px; margin-bottom:10px;}
+    .quote-avatar{
+      height:48px; width:48px; border-radius:999px; display:grid; place-items:center; color:#fff;
+      background:#2563eb;
+    }
+    .quote-avatar.teal{ background:#0ca678; }
+    .quote-card em{color:#374151;}
+
+    /* ===== CTA bandı ===== */
+    .cta-band{
+      text-align:center; color:#fff; border-radius:18px; padding:28px 18px; margin: 18px 0 56px;
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      box-shadow:0 20px 60px -24px var(--ring);
+    }
+    .cta-band h2{font-size: clamp(20px, 2.6vw, 28px); font-weight:900; margin-bottom:10px;}
+    .cta-band p{opacity:.95; margin-bottom:16px;}
+    .btn-white{
+      display:inline-block; font-weight:800; border-radius:12px; padding:12px 22px; text-decoration:none;
+      background:#fff; color:var(--blue-600);
+    }
+    .btn-white:hover{background:#f3f4f6;}
+    .cta-band .back{
+      display:inline-block; margin-top:8px; color:#e5f2ff; text-decoration:underline; font-weight:700;
+    }
+
+    /* ===== Footer ===== */
+    footer{border-top:1px solid var(--border); background:#fafcff; text-align:center; color:#6b7b8c; padding:24px 0; margin-top:28px;}
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container container-narrow">
+    <h1>Land Your Dream Internship with <span class="grad-text">Your Projects</span></h1>
+    <p>Skip the GPA competition. Show companies what you can actually build and get hired for your coding skills, not your grades.</p>
+    <a href="{% url 'register' %}" class="btn-hero">Start Building Your Portfolio</a>
+  </div>
+</section>
+
+<!-- Why Students Choose -->
+<section class="container container-narrow" style="padding: 56px 0 24px;">
+  <h2 class="section-title">Why Students Choose lazyIntern</h2>
+
+  <div class="row g-4 align-items-start" style="margin-top: 8px;">
+    <div class="col-md-6">
+      <div class="d-flex flex-column gap-3">
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <div>
+            <h5 class="mb-1" style="font-weight:700;">Skills Over Grades</h5>
+            <p class="mb-0" style="color:var(--muted);">Get recognized for what you can build, not just your academic performance.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <div>
+            <h5 class="mb-1" style="font-weight:700;">Direct Company Access</h5>
+            <p class="mb-0" style="color:var(--muted);">Connect directly with hiring managers who value practical experience.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <div>
+            <h5 class="mb-1" style="font-weight:700;">Project-Based Matching</h5>
+            <p class="mb-0" style="color:var(--muted);">Get matched with roles that align with your project experience and interests.</p>
+          </div>
+        </div>
+        <div class="check-item">
+          <div class="check-icon">✓</div>
+          <div>
+            <h5 class="mb-1" style="font-weight:700;">No University Bias</h5>
+            <p class="mb-0" style="color:var(--muted);">Your talent matters more than your university ranking or location.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="mini-cards">
+        <div class="mini-card">
+          <div class="mini-icon">🧩</div>
+          <h3>Project Showcase</h3>
+          <p>Display Your Work</p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-icon" style="background:linear-gradient(135deg, var(--teal-600), #14b8a6);">💼</div>
+          <h3>Direct Matching</h3>
+          <p>Connect with Companies</p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-icon" style="background:linear-gradient(135deg, var(--purple-600), #a855f7);">🎯</div>
+          <h3>Skill-Based</h3>
+          <p>Beyond Academics</p>
+        </div>
+        <div class="mini-card">
+          <div class="mini-icon" style="background:linear-gradient(135deg, var(--yellow-600), #f59e0b);">⚡</div>
+          <h3>Fast Track</h3>
+          <p>Quick Connections</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- What Makes a Great Student Profile -->
+<section class="container container-narrow" style="padding: 8px 0 24px;">
+  <h2 class="section-title">What Makes a Great Student Profile</h2>
+
+  <div class="grid-3">
+    <div class="cardx">
+      <h3><span class="pill">{"</span>"}<span>Coding Projects</span></h3>
+      <p style="color:var(--muted);" class="mb-2">Showcase your best work with detailed project descriptions:</p>
+      <ul>
+        <li>Web applications and mobile apps</li>
+        <li>Open source contributions</li>
+        <li>Personal coding challenges</li>
+        <li>Hackathon projects</li>
+        <li>Course assignments (impressive ones)</li>
+      </ul>
+    </div>
+
+    <div class="cardx">
+      <h3><span class="pill">🎓</span><span>Technical Skills</span></h3>
+      <p style="color:var(--muted);" class="mb-2">List your programming languages and technologies:</p>
+      <ul>
+        <li>Programming languages (Python, Java, etc.)</li>
+        <li>Frameworks (React, Django, etc.)</li>
+        <li>Databases (SQL, MongoDB, etc.)</li>
+        <li>Tools (Git, Docker, etc.)</li>
+        <li>Cloud platforms (AWS, Azure, etc.)</li>
+      </ul>
+    </div>
+
+    <div class="cardx">
+      <h3><span class="pill" style="background:linear-gradient(135deg, var(--purple-600), #a855f7);">💼</span><span>Professional Links</span></h3>
+      <p style="color:var(--muted);" class="mb-2">Connect your online presence and portfolio:</p>
+      <ul>
+        <li>GitHub profile with active repositories</li>
+        <li>LinkedIn professional profile</li>
+        <li>Personal portfolio website</li>
+        <li>Live project demos</li>
+        <li>Technical blog or articles</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Why Project-Based Hiring Works -->
+<section class="container container-narrow" style="padding: 8px 0 12px;">
+  <h2 class="section-title">Why Project-Based Hiring Works</h2>
+
+  <div class="grid-2">
+    <div class="quote-card">
+      <div class="quote-head">
+        <div class="quote-avatar">{"</div>"} 
+        <div>
+          <h5 class="mb-0" style="font-weight:700;">Show, Don't Tell</h5>
+          <small style="color:#6b7280;">Demonstrate your abilities</small>
+        </div>
+      </div>
+      <p><em>"Your projects speak louder than your grades. Companies can see exactly what you're capable of building and how you approach problem-solving through your actual work."</em></p>
+    </div>
+
+    <div class="quote-card teal">
+      <div class="quote-head">
+        <div class="quote-avatar teal">🎯</div>
+        <div>
+          <h5 class="mb-0" style="font-weight:700;">Level Playing Field</h5>
+          <small style="color:#6b7280;">Equal opportunity for all</small>
+        </div>
+      </div>
+      <p><em>"Whether you're from a top university or teaching yourself, your skills and projects matter most. Great talent comes from everywhere, and we help companies find it."</em></p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Band -->
+<section class="container container-narrow">
+  <div class="cta-band">
+    <h2>Ready to Showcase Your Coding Skills?</h2>
+    <p>Join talented students who are getting discovered through project-based hiring.</p>
+    <a href="{% url 'login' %}" class="btn-white">Create Your Profile Now</a>
+    <div><a href="{% url 'home' %}" class="back">← Back to Home</a></div>
+  </div>
+</section>
+
+<footer>
+  © 2025 lazyIntern. All rights reserved.
+</footer>
+
+</body>
+</html>

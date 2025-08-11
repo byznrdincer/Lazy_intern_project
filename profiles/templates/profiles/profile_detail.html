@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Student Dashboard - lazyIntern</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <style>
+        /* ===== lazyIntern Calm Theme ===== */
+        :root{
+          --text:#0f172a; --muted:#64748b; --bg:#ffffff;
+          --blue-50:#eef4ff; --teal-50:#ecfdfa;
+          --blue-400:#60a5fa; --blue-500:#3b82f6;
+          --teal-400:#2dd4bf; --teal-500:#14b8a6;
+          --purple-500:#8b5cf6;
+          --border:#e6eaf2; --ring:rgba(16,24,40,.08);
+        }
+        html,body{height:100%;}
+        body{
+          font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+          color:var(--text);
+          background:
+            radial-gradient(1100px 750px at 8% -10%, var(--blue-50) 0%, transparent 60%),
+            radial-gradient(1100px 750px at 100% 8%, var(--teal-50) 0%, transparent 60%),
+            var(--bg);
+        }
+
+        /* Navbar */
+        .navbar{
+          border-bottom:1px solid var(--border);
+          background:#fff !important;
+        }
+        .navbar-brand{
+          font-weight:900; letter-spacing:.2px;
+          background:linear-gradient(90deg, var(--blue-500), var(--teal-500));
+          -webkit-background-clip:text; background-clip:text; color:transparent;
+        }
+
+        /* Head texts */
+        h2.fw-bold{ letter-spacing:-.3px; }
+        .container > p, .page-head p{ color:var(--muted); }
+
+        /* Stat cards */
+        .card-box{
+          border:1px solid var(--border);
+          border-radius:16px;
+          padding:18px;
+          min-height:150px;
+          color:#0b1324;
+          background:#fff;
+          box-shadow:0 18px 48px -24px var(--ring);
+        }
+        .card-box h5{ font-weight:800; font-size:15px; margin:0 0 6px; }
+        .card-box h2{ font-weight:900; font-size:34px; margin:0; line-height:1; }
+        .card-box p{ color:var(--muted); margin:4px 0 0; }
+
+        /* Soft backgrounds */
+        .bg-blue   { background:linear-gradient(135deg, #ffffff, #ebf2ff); }
+        .bg-green  { background:linear-gradient(135deg, #ffffff, #ecfffb); }
+        .bg-purple { background:linear-gradient(135deg, #ffffff, #f2ecff); }
+
+        /* Profile completion */
+        .profile-progress{
+          border:1px solid var(--border);
+          border-radius:16px;
+          padding:18px;
+          background:#fff;
+          box-shadow:0 18px 48px -24px var(--ring);
+        }
+        .profile-progress h5{ font-weight:800; margin-bottom:8px; }
+        .progress{
+          height:18px;
+          background:#eef2f7;
+          border:1px solid var(--border);
+          border-radius:999px;
+          overflow:hidden;
+        }
+        .progress-bar{
+          background:linear-gradient(90deg, var(--blue-400), var(--teal-400));
+          font-weight:700;
+        }
+        .profile-progress ul{ margin:10px 0 0 18px; color:var(--muted); }
+
+        /* Section cards */
+        .card{
+          border:1px solid var(--border);
+          border-radius:18px;
+          background:#fff;
+          box-shadow:0 18px 48px -24px var(--ring);
+        }
+        .section-title{
+          font-weight:900; letter-spacing:-.2px; color:#0b1324;
+          border-bottom:0; padding-bottom:0; margin-bottom:10px;
+        }
+
+        /* Forms */
+        .form-label{ font-weight:700; }
+        .form-control, .form-select{
+          border-radius:12px; border:1px solid var(--border);
+          padding:.7rem .9rem;
+        }
+        .form-control:focus, .form-select:focus{
+          box-shadow:0 0 0 .2rem rgba(96,165,250,.18);
+          border-color:#d7e5ff;
+        }
+
+        /* Buttons */
+        .btn-primary{
+          background:linear-gradient(90deg, var(--blue-400), var(--teal-400));
+          border:0; font-weight:800; border-radius:12px;
+          box-shadow:0 12px 34px -18px var(--ring);
+        }
+        .btn-success{
+          background:linear-gradient(90deg, #34d399, #22c55e);
+          border:0; font-weight:800; border-radius:12px;
+          box-shadow:0 12px 34px -18px var(--ring);
+        }
+        .btn-outline-primary{ border-color:#cfe0ff; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-light justify-content-between px-5">
+    <a class="navbar-brand fw-bold">lazyIntern</a>
+    <div>
+        <a href="#" class="btn btn-outline-primary">Dashboard</a>
+        <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+    </div>
+</nav>
+
+<div class="container my-4">
+    <div class="page-head">
+      <h2 class="fw-bold">Student Dashboard</h2>
+      <p>Build your profile and get discovered by top recruiters</p>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card-box bg-blue text-center">
+                <h5>Profile Views</h5>
+                <h2>{{ profile_views }}</h2>
+                <p>Total Views</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-box bg-green text-center">
+                <h5>Skills Added</h5>
+                <h2>{{ skills_count }}</h2>
+                <p>Keep adding more!</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card-box bg-purple text-center">
+                <h5>Projects</h5>
+                <h2>{{ projects_count }}</h2>
+                <p>Showcase your work</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="profile-progress">
+                <h5>Profile Completion</h5>
+                <div class="progress mb-2">
+                    <!-- bg-danger kaldırıldı ki gradient çalışsın -->
+                    <div class="progress-bar" style="width: {{ completion_percent }}%;">{{ completion_percent }}%</div>
+                </div>
+                <ul>
+                    {% if not profile.bio %}
+                    <li>Add a bio</li>
+                    {% endif %}
+                    {% if not profile.location %}
+                    <li>Add location</li>
+                    {% endif %}
+                    {% if skills_count == 0 %}
+                    <li>Add skills</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Information Form -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Personal Information</h4>
+        <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="full_name" class="form-label">Full Name *</label>
+                <input type="text" id="full_name" name="full_name" class="form-control" 
+                       value="{{ full_name }}" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email Address *</label>
+                <input type="email" id="email" name="email" class="form-control" 
+                       value="{{ profile_user.email }}" placeholder="Enter your email address" required>
+                <small class="text-muted">This email will be used by recruiters to contact you directly</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="university" class="form-label">University *</label>
+                    <input type="text" id="university" name="university" class="form-control" 
+                           placeholder="Enter your university name" value="{{ profile.university }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="major" class="form-label">Major/Field of Study *</label>
+                    <input type="text" id="major" name="major" class="form-control" 
+                           placeholder="e.g., Computer Science, Mechanical Engineering" value="{{ profile.major }}" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="graduation_year" class="form-label">Graduation Year *</label>
+                    <select id="graduation_year" name="graduation_year" class="form-select" required>
+                        <option value="" disabled {% if not profile.graduation_year %}selected{% endif %}>Select graduation year</option>
+                        {% for year in years %}
+                            <option value="{{ year }}" {% if profile.graduation_year == year %}selected{% endif %}>{{ year }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="location" class="form-label">Current Location</label>
+                    <input type="text" id="location" name="location" class="form-control" 
+                           placeholder="City, State/Country" value="{{ profile.location }}">
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio/About Me</label>
+                <textarea id="bio" name="bio" class="form-control" rows="4" 
+                          placeholder="Tell recruiters about yourself, your interests, and career goals...">{{ profile.bio }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="profile_submit">Save Changes</button>
+        </form>
+    </div>
+
+    <!-- Social Links -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Social Links</h4>
+        <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="github" class="form-label">GitHub URL</label>
+                <input type="url" id="github" name="github" class="form-control" placeholder="https://github.com/yourusername" value="{{ profile.github }}">
+            </div>
+            <div class="mb-3">
+                <label for="linkedin" class="form-label">LinkedIn URL</label>
+                <input type="url" id="linkedin" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/yourusername" value="{{ profile.linkedin }}">
+            </div>
+            <div class="mb-3">
+                <label for="website" class="form-label">Website/Portfolio URLs</label>
+                <input type="url" id="website" name="website" class="form-control" placeholder="Add Website" value="{{ profile.website }}">
+                <small class="text-muted">Add your portfolio, personal websites, or other relevant links.</small>
+            </div>
+            <div class="mb-3">
+                <label for="legacy_website" class="form-label">Legacy Website URL (for backward compatibility)</label>
+                <input type="url" id="legacy_website" name="legacy_website" class="form-control" placeholder="https://yourwebsite.com" value="{{ profile.legacy_website }}">
+                <small class="text-muted">This field is kept for backward compatibility. Use the "Website/Portfolio URLs" section above for multiple links.</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="social_submit">Save Social Links</button>
+        </form>
+    </div>
+
+    <!-- Internship Preferences -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Internship Preferences</h4>
+        <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="internship_type" class="form-label">Internship Type Preference</label>
+                <select id="internship_type" name="internship_type" class="form-select">
+                    <option value="" {% if not profile.internship_type %}selected{% endif %}>Select preference</option>
+                    <option value="full_time" {% if profile.internship_type == "full_time" %}selected{% endif %}>Full Time</option>
+                    <option value="part_time" {% if profile.internship_type == "part_time" %}selected{% endif %}>Part Time</option>
+                    <option value="remote" {% if profile.internship_type == "remote" %}selected{% endif %}>Remote</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="preferred_locations" class="form-label">Preferred Internship Locations</label>
+                <input type="text" id="preferred_locations" name="preferred_locations" class="form-control" placeholder="Add Location" value="{{ profile.preferred_locations }}">
+                <small class="text-muted">Help recruiters understand your preferred internship locations.</small>
+            </div>
+
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="open_to_relocate" name="open_to_relocate" {% if profile.open_to_relocate %}checked{% endif %}/>
+                <label class="form-check-label" for="open_to_relocate">
+                    I'm willing to relocate for the right internship opportunity
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="internship_submit">Save Preferences</button>
+        </form>
+    </div>
+
+    <!-- Skills & Competencies -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Skills & Competencies</h4>
+        <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="skills" class="form-label">Professional Skills</label>
+                <select id="skills" name="skills" class="form-select" multiple>
+                    {% for skill in all_skills %}
+                        <option value="{{ skill.id }}" {% if skill in profile.skills.all %}selected{% endif %}>{{ skill.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">Select your skills from engineering, business, digital marketing, and all internship-relevant competencies...</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="skills_submit">Save Skills</button>
+        </form>
+    </div>
+
+    <!-- Projects -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Projects</h4>
+        <button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#addProjectForm" aria-expanded="false" aria-controls="addProjectForm">
+            Add Project
+        </button>
+
+        <div class="collapse" id="addProjectForm">
+            <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+                {% csrf_token %}
+                {{ project_form.as_p }}
+                <button type="submit" name="project_submit" class="btn btn-primary">Save Project</button>
+            </form>
+        </div>
+
+        {% if projects_count == 0 %}
+            <p>No projects added yet. Click "Add Project" to showcase your work!</p>
+        {% else %}
+            <ul>
+                {% for project in profile.projects.all %}
+                    <li>
+                        <strong>{{ project.title }}</strong> - {{ project.technologies }} 
+                        {% if project.link %}
+                            (<a href="{{ project.link }}" target="_blank">Link</a>)
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p>Projects with technologies help recruiters discover your skills.</p>
+    </div>
+
+    <!-- Certifications -->
+    <div class="card mb-4 p-4">
+        <h4 class="section-title">Certifications ({{ certifications_count }})</h4>
+        <button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#addCertificationForm" aria-expanded="false" aria-controls="addCertificationForm">
+            Add Certification
+        </button>
+
+        <div class="collapse" id="addCertificationForm">
+            <form method="post" action="{% url 'profile_detail' profile_user.username %}">
+                {% csrf_token %}
+                {{ certification_form.as_p }}
+                <button type="submit" name="certification_submit" class="btn btn-primary">Save Certification</button>
+            </form>
+        </div>
+
+        {% if certifications_count == 0 %}
+            <p>No certifications added yet.</p>
+        {% else %}
+            <ul>
+                {% for cert in profile.certifications.all %}
+                    <li>{{ cert.name }} - {{ cert.organization }} ({{ cert.date_obtained }}) 
+                        {% if cert.certificate_url %}
+                            (<a href="{{ cert.certificate_url }}" target="_blank">Certificate</a>)
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <p>Add your professional certifications to showcase your expertise.</p>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
