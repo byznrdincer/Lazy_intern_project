@@ -1,0 +1,282 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>For Companies - smartIntern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap kalsın -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <style>
+    /* ===== Theme tokens (lazyIntern görünümü) ===== */
+    :root{
+      --bg:#ffffff; --text:#0b1324; --muted:#5b6b7a;
+      --blue-50:#eef4ff; --teal-50:#ecfdfa;
+      --blue-600:#2563eb; --teal-600:#0ca678; --purple-600:#7c3aed;
+      --green-600:#16a34a; --red-500:#ef4444; --yellow-600:#ca8a04;
+      --ring:rgba(37,99,235,.16); --card:#fff; --border:#eef2f7;
+    }
+    html,body{height:100%;}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 800px at 10% -10%, var(--blue-50), transparent 60%),
+        radial-gradient(1200px 800px at 110% 10%, var(--teal-50), transparent 60%),
+        var(--bg);
+    }
+    .container-narrow{max-width:1100px; margin:0 auto; padding:0 16px;}
+
+    /* ===== Hero (gradient + büyük başlık) ===== */
+    .hero{
+      padding: clamp(64px, 8vw, 120px) 0 40px;
+      text-align:center;
+      background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(12,166,120,0.06) 100%);
+      color:inherit;
+    }
+    .hero h1{
+      font-size: clamp(36px, 6vw, 56px);
+      font-weight:900; letter-spacing:-.4px; margin:0 0 12px;
+    }
+    .grad-text{
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .hero p{
+      max-width:900px; margin:0 auto 22px; font-size: clamp(16px, 2.2vw, 20px); color:var(--muted);
+    }
+    .btn-hero{
+      display:inline-block; border:none; font-weight:800; color:#fff; text-decoration:none;
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      padding:12px 26px; border-radius:12px;
+      box-shadow:0 16px 44px -18px var(--ring);
+    }
+    .btn-hero:hover{filter:brightness(1.05); transform:translateY(-1px); text-decoration:none;}
+
+    /* ===== Section titles ===== */
+    .section-title{
+      text-align:center; font-weight:900; letter-spacing:-.3px;
+      font-size: clamp(24px, 3.2vw, 34px); margin: 56px 0 16px;
+    }
+
+    /* ===== Problems We Solve (iki sütun) ===== */
+    .problems h4{font-weight:800; margin-bottom:12px;}
+    .bullet-red li,
+    .bullet-green li{margin-bottom:10px; color:var(--muted);}
+    .bullet-red{list-style:none; padding-left:0;}
+    .bullet-red li::before{
+      content:""; display:inline-block; width:8px; height:8px; border-radius:999px;
+      background:var(--red-500); margin-right:10px; transform:translateY(-1px);
+    }
+    .bullet-green{list-style:none; padding-left:0;}
+    .bullet-green li::before{
+      content:"✓"; display:inline-grid; place-items:center;
+      width:20px; height:20px; border-radius:999px; font-size:12px; color:#fff;
+      background:linear-gradient(135deg, #22c55e, var(--green-600));
+      margin-right:8px;
+    }
+
+    /* ===== Features (3 kart) ===== */
+    .cards-3{display:grid; gap:18px; grid-template-columns:1fr;}
+    @media(min-width:768px){ .cards-3{grid-template-columns:repeat(3,1fr);} }
+    .cardx{
+      border:1px solid var(--border); border-radius:18px; background:var(--card);
+      padding:24px; text-align:left; box-shadow:0 14px 42px -18px var(--ring);
+      height:100%;
+    }
+    .feat-icon{
+      height:52px; width:52px; border-radius:14px; display:grid; place-items:center; color:#fff;
+      background:linear-gradient(135deg, var(--blue-600), var(--teal-600)); margin-bottom:12px; font-size:22px;
+      box-shadow:0 10px 30px -14px var(--ring);
+    }
+    .cardx h5{font-weight:800; margin-bottom:10px;}
+    .cardx ul{padding-left:0; list-style:none; margin:0;}
+    .cardx ul li{display:flex; gap:8px; align-items:flex-start; color:var(--muted); margin-bottom:8px;}
+    .tick{
+      width:18px; height:18px; border-radius:999px; display:grid; place-items:center; color:#fff; font-size:11px;
+      background:linear-gradient(135deg, #22c55e, var(--green-600)); flex:0 0 18px; margin-top:3px;
+    }
+
+    /* ===== Benefits (4 küçük kart) ===== */
+    .cards-4{display:grid; gap:16px; grid-template-columns:repeat(1,1fr);}
+    @media(min-width:768px){ .cards-4{grid-template-columns:repeat(2,1fr);} }
+    @media(min-width:992px){ .cards-4{grid-template-columns:repeat(4,1fr);} }
+    .mini-card{
+      border:1px solid var(--border); border-radius:18px; background:#fff; text-align:center; padding:22px;
+      box-shadow:0 12px 36px -18px var(--ring);
+    }
+    .mini-card .mini-ic{
+      height:52px; width:52px; border-radius:14px; display:grid; place-items:center; margin:0 auto 10px; color:#fff;
+      background:linear-gradient(135deg, var(--blue-600), var(--teal-600)); font-size:22px;
+      box-shadow:0 10px 30px -14px var(--ring);
+    }
+    .mini-card h3{font-size:16px; font-weight:800; margin-bottom:4px;}
+    .mini-card p{color:var(--muted); margin:0;}
+
+    /* ===== Company sizes (3 kart) ===== */
+    .cards-3c{display:grid; gap:18px; grid-template-columns:1fr;}
+    @media(min-width:768px){ .cards-3c{grid-template-columns:repeat(3,1fr);} }
+    .center{ text-align:center; }
+
+    /* ===== CTA bandı ===== */
+    .cta-band{
+      text-align:center; color:#fff; border-radius:18px; padding:28px 18px; margin: 18px 0 56px;
+      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      box-shadow:0 20px 60px -24px var(--ring);
+    }
+    .cta-band h2{font-size: clamp(20px, 2.6vw, 28px); font-weight:900; margin-bottom:10px;}
+    .cta-band p{opacity:.95; margin-bottom:16px;}
+    .btn-white{
+      display:inline-block; font-weight:800; border-radius:12px; padding:12px 22px; text-decoration:none;
+      background:#fff; color:var(--blue-600);
+    }
+    .btn-white:hover{background:#f3f4f6;}
+    .cta-band .back{
+      display:inline-block; margin-top:8px; color:#e5f2ff; text-decoration:underline; font-weight:700;
+    }
+
+    /* ===== Footer ===== */
+    footer{border-top:1px solid var(--border); background:#fafcff; text-align:center; color:#6b7b8c; padding:24px 0; margin-top:28px;}
+  </style>
+</head>
+<body>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container container-narrow">
+    <h1>Hire Talented Engineers Based on <span class="grad-text">Real Skills</span></h1>
+    <p>Stop screening resumes. Start reviewing actual projects. Find engineering students who can contribute from day one with our project-based talent discovery platform.</p>
+    <a href="{% url 'register' %}" class="btn-hero">Find Engineering Talent</a>
+  </div>
+</section>
+
+<!-- Problems We Solve -->
+<section class="container container-narrow problems" style="padding-top: 8px;">
+  <h2 class="section-title">The Problems We Solve</h2>
+  <div class="row g-4">
+    <div class="col-md-6">
+      <h4 style="color:#dc2626;">Traditional Hiring Problems:</h4>
+      <ul class="bullet-red">
+        <li>Hundreds of identical resumes with no real differentiation</li>
+        <li>Students with high GPAs but no practical hands-on experience</li>
+        <li>Time-consuming technical screening processes</li>
+        <li>Missing out on talented engineers from non-target schools</li>
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <h4 style="color:#16a34a;">smartIntern Solutions:</h4>
+      <ul class="bullet-green">
+        <li>Review actual projects and work before interviewing</li>
+        <li>Find students with proven hands-on technical skills</li>
+        <li>Skip initial technical screens - see their work directly</li>
+        <li>Discover hidden gems from any university or background</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Powerful Hiring Features -->
+<section class="container container-narrow" style="padding-top: 24px;">
+  <h2 class="section-title">Powerful Hiring Features</h2>
+  <div class="cards-3">
+    <div class="cardx">
+      <div class="feat-icon">🔎</div>
+      <h5>Smart Search &amp; Filters</h5>
+      <ul>
+        <li><span class="tick">✓</span><span>Search by technical skills and tools</span></li>
+        <li><span class="tick">✓</span><span>Filter by project types and complexity</span></li>
+        <li><span class="tick">✓</span><span>Location and availability preferences</span></li>
+        <li><span class="tick">✓</span><span>Engineering discipline matching</span></li>
+      </ul>
+    </div>
+
+    <div class="cardx">
+      <div class="feat-icon" style="background:linear-gradient(135deg, var(--teal-600), #14b8a6);">🎯</div>
+      <h5>Project Portfolio Review</h5>
+      <ul>
+        <li><span class="tick">✓</span><span>View live project demos</span></li>
+        <li><span class="tick">✓</span><span>Browse project repositories</span></li>
+        <li><span class="tick">✓</span><span>See project descriptions and impact</span></li>
+        <li><span class="tick">✓</span><span>Evaluate technical quality and approach</span></li>
+      </ul>
+    </div>
+
+    <div class="cardx">
+      <div class="feat-icon" style="background:linear-gradient(135deg, var(--purple-600), #a855f7);">⚡</div>
+      <h5>Direct Connection</h5>
+      <ul>
+        <li><span class="tick">✓</span><span>Contact students directly</span></li>
+        <li><span class="tick">✓</span><span>Skip traditional application processes</span></li>
+        <li><span class="tick">✓</span><span>Faster hiring decisions</span></li>
+        <li><span class="tick">✓</span><span>Build relationships with top talent</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Benefits (4 kart) -->
+<section class="container container-narrow" style="padding-top: 32px;">
+  <div class="cards-4">
+    <div class="mini-card">
+      <div class="mini-ic">📈</div>
+      <h3>Efficient Process</h3>
+      <p>Streamlined Hiring</p>
+    </div>
+    <div class="mini-card">
+      <div class="mini-ic" style="background:linear-gradient(135deg, var(--teal-600), #14b8a6);">👥</div>
+      <h3>Skilled Talent</h3>
+      <p>Quality Engineers</p>
+    </div>
+    <div class="mini-card">
+      <div class="mini-ic" style="background:linear-gradient(135deg, var(--purple-600), #a855f7);">🏢</div>
+      <h3>Growing Network</h3>
+      <p>Partner Companies</p>
+    </div>
+    <div class="mini-card">
+      <div class="mini-ic" style="background:linear-gradient(135deg, #22c55e, var(--green-600));">✅</div>
+      <h3>Quality Focus</h3>
+      <p>Better Matches</p>
+    </div>
+  </div>
+</section>
+
+<!-- Perfect for All Company Sizes -->
+<section class="container container-narrow" style="padding-top: 40px;">
+  <h2 class="section-title">Perfect for All Company Sizes</h2>
+  <div class="cards-3c">
+    <div class="cardx center">
+      <div class="feat-icon">🏗️</div>
+      <h5>Startups</h5>
+      <p style="color:var(--muted);">Find versatile engineers who can wear multiple hats and contribute from day one.</p>
+    </div>
+    <div class="cardx center">
+      <div class="feat-icon" style="background:linear-gradient(135deg, var(--teal-600), #14b8a6);">📈</div>
+      <h5>Scale-ups</h5>
+      <p style="color:var(--muted);">Scale your engineering team with talented interns who can grow into full-time contributors.</p>
+    </div>
+    <div class="cardx center">
+      <div class="feat-icon" style="background:linear-gradient(135deg, var(--purple-600), #a855f7);">🏢</div>
+      <h5>Enterprises</h5>
+      <p style="color:var(--muted);">Build your future talent pipeline with skilled students who understand modern engineering practices.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="container container-narrow">
+  <div class="cta-band">
+    <h2>Start Hiring Based on Real Skills</h2>
+    <p>Join forward-thinking companies discovering top talent through project-based hiring.</p>
+    <a href="{% url 'register' %}" class="btn-white">Find Your Next Intern</a>
+    <div><a href="{% url 'home' %}" class="back">← Back to Home</a></div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 smartIntern. All rights reserved.</p>
+</footer>
+
+</body>
+</html>

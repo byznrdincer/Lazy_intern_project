@@ -1,0 +1,383 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recruiter Dashboard - lazyIntern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+    /* ===== lazyIntern Calm Theme ===== */
+    :root{
+      --text:#0f172a; --muted:#64748b; --bg:#ffffff;
+      --blue-50:#eef4ff; --teal-50:#ecfdfa;
+      --blue-400:#60a5fa; --blue-500:#3b82f6;
+      --teal-400:#2dd4bf; --teal-500:#14b8a6;
+      --border:#e6eaf2; --ring:rgba(16,24,40,.08);
+      --success:#10b981; --danger:#ef4444;
+    }
+    html,body{height:100%;}
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 750px at 8% -10%, var(--blue-50) 0%, transparent 60%),
+        radial-gradient(1100px 750px at 100% 8%, var(--teal-50) 0%, transparent 60%),
+        var(--bg);
+    }
+    .navbar{border-bottom:1px solid var(--border); background:#fff!important;}
+    .navbar-brand{font-weight:900; letter-spacing:.2px;
+      background:linear-gradient(90deg, var(--blue-500), var(--teal-500));
+      -webkit-background-clip:text; background-clip:text; color:transparent;}
+    .btn-grad{
+      background:linear-gradient(90deg, var(--blue-400), var(--teal-400));
+      border:0; font-weight:800; border-radius:12px; box-shadow:0 12px 34px -18px var(--ring);
+    }
+    .btn-outline-secondary,.btn-outline-danger{border-radius:12px;}
+
+    .page-head p{color:var(--muted);}
+    .card-soft{
+      border:1px solid var(--border); border-radius:18px; background:#fff;
+      box-shadow:0 18px 48px -24px var(--ring);
+    }
+    .alert-soft{
+      background:#fffef5; border:1px solid #fde68a; color:#92400e;
+      border-radius:16px; padding:16px 18px; box-shadow:0 10px 28px -20px var(--ring);
+    }
+    .filter-title{font-weight:900; margin-bottom:8px;}
+    .form-label{font-weight:700;}
+    .form-control,.form-select{border-radius:12px; border:1px solid var(--border); padding:.7rem .9rem;}
+    .form-control:focus,.form-select:focus{box-shadow:0 0 0 .2rem rgba(96,165,250,.18); border-color:#d7e5ff;}
+
+    .tab-switch{display:flex; gap:8px; background:#fafcff; border:1px solid var(--border); border-radius:12px; padding:6px;}
+    .tab-btn{
+      flex:1; border:none; background:transparent; padding:10px 12px; border-radius:10px; font-weight:800; color:var(--muted);
+    }
+    .tab-btn.active{color:#fff; background:linear-gradient(90deg, var(--blue-500), var(--teal-500)); box-shadow:0 12px 36px -20px var(--ring);}
+
+    .student-card{border:1px solid var(--border); border-radius:16px; padding:16px; background:#fff; box-shadow:0 14px 42px -22px var(--ring);}
+    .student-name{font-weight:900; margin:0;}
+    .student-meta{color:var(--muted); margin:2px 0 10px;}
+    .chip{
+      display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+      background:#f4f7fb; border:1px solid var(--border); margin:4px 6px 0 0;
+    }
+    .list-head{display:flex; align-items:center; justify-content:space-between; margin:12px 0 16px;}
+    .muted{color:var(--muted);}
+
+    /* Offcanvas (Company Card) */
+    .offcanvas-header .badge{
+      font-weight:800; letter-spacing:.2px;
+    }
+    .kv{display:flex; justify-content:space-between; gap:12px; padding:10px 0; border-bottom:1px dashed var(--border);}
+    .kv:last-child{border-bottom:none;}
+    .kv .k{color:var(--muted); font-weight:700;}
+    .kv .v{font-weight:800;}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light justify-content-between px-4 px-md-5">
+  <a class="navbar-brand">lazyIntern</a>
+  <div class="d-flex gap-2">
+    <a href="{% url 'profile_redirect' %}" class="btn btn-outline-secondary">Dashboard</a>
+
+    <!-- Company offcanvas trigger -->
+    <button class="btn btn-outline-secondary" type="button"
+            data-bs-toggle="offcanvas" data-bs-target="#companyOffcanvas"
+            aria-controls="companyOffcanvas">
+      Company
+    </button>
+
+    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+  </div>
+</nav>
+
+<!-- Offcanvas: Company Card -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="companyOffcanvas" aria-labelledby="companyOffcanvasLabel">
+  <div class="offcanvas-header">
+    <div>
+      <h5 id="companyOffcanvasLabel" class="mb-1">
+        {{ company.name|default:"Your Company" }}
+      </h5>
+      {% if company.is_verified %}
+        <span class="badge text-bg-success">Verified</span>
+      {% else %}
+        <span class="badge text-bg-secondary">Not Verified</span>
+      {% endif %}
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <div class="card-soft p-3 mb-3">
+      <div class="kv">
+        <div class="k">Slug</div>
+        <div class="v">{{ company.slug }}</div>
+      </div>
+      <div class="kv">
+        <div class="k">Email</div>
+        <div class="v">{{ company.contact_email|default:company.user.email }}</div>
+      </div>
+      <div class="kv">
+        <div class="k">Status</div>
+        <div class="v">
+          {% if company.is_verified %}Verified{% else %}Pending{% endif %}
+        </div>
+      </div>
+      <div class="d-grid mt-3">
+        <a class="btn btn-outline-secondary"
+           href="{% url 'company_profile' company.slug %}">
+          Company Dashboard
+        </a>
+      </div>
+    </div>
+
+    <!-- Send code -->
+    <div class="card-soft p-3 mb-3">
+      <h6 class="fw-bold mb-2">Send verification code</h6>
+      <form method="post" action="{% url 'company_send_verification_code' slug=company.slug %}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <div class="mb-2">
+          <input type="email" class="form-control" name="verification_email"
+                 placeholder="name@company.com"
+                 value="{{ company.contact_email|default:company.user.email }}">
+        </div>
+        <button class="btn btn-grad w-100" type="submit">Send Code</button>
+      </form>
+      <div class="form-text mt-1">Code is valid for 10 minutes.</div>
+    </div>
+
+    <!-- Go to verify page -->
+    <div class="d-grid">
+      <a class="btn btn-success"
+         href="{% url 'company_email_verify' slug=company.slug %}?next={{ request.get_full_path|urlencode }}">
+        Enter code & verify
+      </a>
+    </div>
+  </div>
+</div>
+<!-- /Offcanvas -->
+
+<div class="container py-4">
+  <div class="mb-4 page-head">
+    <h1 class="fw-bold display-6 mb-1">Recruiter Dashboard</h1>
+    <p class="fs-5">Find and connect with talented students</p>
+  </div>
+
+  {% if recruiter_profile and not recruiter_profile.name and not profile_loading %}
+    <div class="alert-soft mb-4">
+      <h6 class="fw-bold mb-1">Complete Your Profile</h6>
+      <div class="small">Please fill out your profile information to get started with recruiting.</div>
+    </div>
+    <div class="card-soft p-4 mb-4">
+      <h4 class="mb-3 fw-bold">Your Profile</h4>
+      <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Name</label>
+            <input type="text" name="name" class="form-control" value="{{ recruiter_profile.name|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Phone</label>
+            <input type="text" name="phone" class="form-control" value="{{ recruiter_profile.phone|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Company Name</label>
+            <input type="text" name="company_name" class="form-control" value="{{ recruiter_profile.company_name|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Position</label>
+            <input type="text" name="position" class="form-control" value="{{ recruiter_profile.position|default:'' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Location</label>
+            <input type="text" name="location" class="form-control" value="{{ recruiter_profile.location|default:'' }}">
+          </div>
+        </div>
+        <div class="d-flex justify-content-end mt-3">
+          <button class="btn btn-grad">Save Profile</button>
+        </div>
+      </form>
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- Filters -->
+    <div class="col-lg-3">
+      <div class="card-soft p-4">
+        <div class="filter-title">Filters</div>
+        <form method="get">
+          <div class="mb-3">
+            <label class="form-label">Major</label>
+            <input type="text" class="form-control" name="major" value="{{ request.GET.major|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Skill</label>
+            <input type="text" class="form-control" name="skill" value="{{ request.GET.skill|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Project Skill</label>
+            <input type="text" class="form-control" name="project_skill" value="{{ request.GET.project_skill|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Location</label>
+            <input type="text" class="form-control" name="location" value="{{ request.GET.location|default:'' }}">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Graduation Year</label>
+            <input type="text" class="form-control" name="graduation_year" value="{{ request.GET.graduation_year|default:'' }}" placeholder="e.g. 2026">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Internship Type</label>
+            <select class="form-select" name="internship_type">
+              <option value="">Any</option>
+              <option value="full_time" {% if request.GET.internship_type == 'full_time' %}selected{% endif %}>Full Time</option>
+              <option value="part_time" {% if request.GET.internship_type == 'part_time' %}selected{% endif %}>Part Time</option>
+              <option value="remote" {% if request.GET.internship_type == 'remote' %}selected{% endif %}>Remote</option>
+            </select>
+          </div>
+          <div class="d-grid gap-2">
+            <button class="btn btn-grad" type="submit">Apply Filters</button>
+            <a href="." class="btn btn-outline-secondary">Clear Filters</a>
+          </div>
+        </form>
+        <hr class="my-4">
+        <div class="small muted">
+          Showing <strong>{{ students|length }}</strong> students
+        </div>
+      </div>
+    </div>
+
+    <!-- Student List -->
+    <div class="col-lg-9">
+      <div class="card-soft p-4">
+        <!-- Tabs -->
+        <div class="tab-switch mb-3">
+          {% with tab=request.GET.tab|default:'all' %}
+            <button class="tab-btn {% if tab == 'all' %}active{% endif %}" onclick="switchTab('all')" type="button">All</button>
+            <button class="tab-btn {% if tab == 'bookmarked' %}active{% endif %}" onclick="switchTab('bookmarked')" type="button">Bookmarked</button>
+          {% endwith %}
+        </div>
+
+        <!-- Head -->
+        <div class="list-head">
+          <div class="muted small">
+            {% if request.GET.tab == 'bookmarked' %}
+              Bookmarked: <strong>{{ bookmarked_students|length }}</strong>
+            {% else %}
+              Results: <strong>{{ students|length }}</strong>
+            {% endif %}
+          </div>
+          {% if request.GET %}
+            <a href="." class="btn btn-outline-secondary btn-sm">Clear Filters</a>
+          {% endif %}
+        </div>
+
+        <!-- All Tab -->
+        <div id="tab-all" class="{% if request.GET.tab and request.GET.tab != 'all' %}d-none{% endif %}">
+          {% for s in students %}
+            <div class="student-card mb-3">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                  <h5 class="student-name">
+                    {% if s.user.get_full_name %}{{ s.user.get_full_name }}{% else %}{{ s.user.username }}{% endif %}
+                  </h5>
+                  <div class="student-meta">
+                    {{ s.major }} • {{ s.location }}{% if s.graduation_year %} • {{ s.graduation_year }}{% endif %}
+                  </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="d-flex gap-2">
+                  <!-- Bookmark toggle -->
+                  <form method="post" action="{% url 'toggle_bookmark' s.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">
+                      {% if bookmarked_ids and s.id in bookmarked_ids %}
+                        Unbookmark
+                      {% else %}
+                        Bookmark
+                      {% endif %}
+                    </button>
+                  </form>
+
+                  <!-- View profile (user_id ile) -->
+                  <a href="{% url 'student_profile_view' s.user.id %}" class="btn btn-grad btn-sm">
+                    View Profile
+                  </a>
+                </div>
+              </div>
+
+              {% if s.skills.all %}
+                <div class="mt-2">
+                  {% for skill in s.skills.all|slice:":8" %}
+                    <span class="chip">{{ skill.name }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% empty %}
+            <div class="muted">No students found.</div>
+          {% endfor %}
+        </div>
+
+        <!-- Bookmarked Tab -->
+        <div id="tab-bookmarked" class="{% if not request.GET.tab or request.GET.tab == 'all' %}d-none{% endif %}">
+          {% for s in bookmarked_students %}
+            <div class="student-card mb-3">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                  <h5 class="student-name">
+                    {% if s.user.get_full_name %}{{ s.user.get_full_name }}{% else %}{{ s.user.username }}{% endif %}
+                  </h5>
+                  <div class="student-meta">
+                    {{ s.major }} • {{ s.location }}{% if s.graduation_year %} • {{ s.graduation_year }}{% endif %}
+                  </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="d-flex gap-2">
+                  <form method="post" action="{% url 'toggle_bookmark' s.id %}" class="d-inline">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <button type="submit" class="btn btn-outline-secondary btn-sm">Unbookmark</button>
+                  </form>
+
+                  <a href="{% url 'student_profile_view' s.user.id %}" class="btn btn-grad btn-sm">
+                    View Profile
+                  </a>
+                </div>
+              </div>
+
+              {% if s.skills.all %}
+                <div class="mt-2">
+                  {% for skill in s.skills.all|slice:":8" %}
+                    <span class="chip">{{ skill.name }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </div>
+          {% empty %}
+            <div class="muted">No bookmarked students yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(tab){
+    const url = new URL(window.location);
+    url.searchParams.set('tab', tab);
+    window.location = url.toString();
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

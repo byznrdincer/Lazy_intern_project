@@ -1,0 +1,187 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{{ profile_user.get_full_name|default:profile_user.username }} – Profile | lazyIntern</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <style>
+    :root{
+      --text:#0f172a; --muted:#64748b; --bg:#ffffff;
+      --blue-50:#eef4ff; --teal-50:#ecfdfa;
+      --blue-400:#60a5fa; --blue-500:#3b82f6;
+      --teal-400:#2dd4bf; --teal-500:#14b8a6;
+      --border:#e6eaf2; --ring:rgba(16,24,40,.08);
+    }
+    body{
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1100px 750px at 8% -10%, var(--blue-50) 0%, transparent 60%),
+        radial-gradient(1100px 750px at 100% 8%, var(--teal-50) 0%, transparent 60%),
+        var(--bg);
+    }
+    .navbar{border-bottom:1px solid var(--border); background:#fff!important;}
+    .navbar-brand{
+      font-weight:900; letter-spacing:.2px;
+      background:linear-gradient(90deg,var(--blue-500),var(--teal-500));
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .card-soft{
+      border:1px solid var(--border); border-radius:18px; background:#fff;
+      box-shadow:0 18px 48px -24px var(--ring);
+    }
+    .chip{
+      display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+      background:#f4f7fb; border:1px solid var(--border); margin:4px 6px 0 0;
+    }
+    .muted{color:var(--muted);}
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light justify-content-between px-4 px-md-5">
+  <a class="navbar-brand">lazyIntern</a>
+  <div class="d-flex gap-2">
+    <a href="javascript:history.back()" class="btn btn-outline-secondary">Back</a>
+    <a href="{% url 'profile_redirect' %}" class="btn btn-outline-primary">Dashboard</a>
+    <a href="{% url 'logout' %}" class="btn btn-outline-danger">Logout</a>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h2 class="fw-bold mb-1">
+        {{ profile_user.get_full_name|default:profile_user.username }}
+      </h2>
+      <div class="muted">
+        {{ profile.major|default:"—" }}
+        {% if profile.location %} • {{ profile.location }}{% endif %}
+        {% if profile.graduation_year %} • Class of {{ profile.graduation_year }}{% endif %}
+      </div>
+    </div>
+    <div class="text-end">
+      <div class="small muted">Profile Views</div>
+      <div class="fs-4 fw-bold">{{ profile_views|default:"0" }}</div>
+    </div>
+  </div>
+
+  <!-- About -->
+  <div class="card-soft p-4 mb-4">
+    <h5 class="fw-bold mb-2">About</h5>
+    <p class="mb-0">{{ profile.bio|default:"No bio added yet." }}</p>
+  </div>
+
+  <!-- Skills -->
+  <div class="card-soft p-4 mb-4">
+    <h5 class="fw-bold mb-2">Skills</h5>
+    {% if skills %}
+      <div>
+        {% for sk in skills %}
+          <span class="chip">{{ sk.name }}</span>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="muted">No skills added.</div>
+    {% endif %}
+  </div>
+
+  <!-- Projects -->
+  <div class="card-soft p-4 mb-4">
+    <h5 class="fw-bold mb-3">Projects</h5>
+    {% if projects %}
+      <div class="list-group">
+        {% for pr in projects %}
+          <div class="list-group-item border-0 px-0">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="fw-semibold">{{ pr.title }}</div>
+                {% if pr.technologies %}
+                  <div class="small muted">Tech: {{ pr.technologies }}</div>
+                {% endif %}
+                {% if pr.description %}
+                  <div class="small mt-1">{{ pr.description }}</div>
+                {% endif %}
+              </div>
+              {% if pr.link %}
+                <a href="{{ pr.link }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="muted">No projects yet.</div>
+    {% endif %}
+  </div>
+
+  <!-- Certifications -->
+  <div class="card-soft p-4 mb-4">
+    <h5 class="fw-bold mb-3">Certifications</h5>
+    {% if certifications %}
+      <ul class="mb-0">
+        {% for c in certifications %}
+          <li>
+            <strong>{{ c.name }}</strong> – {{ c.organization }}
+            {% if c.date_obtained %} ({{ c.date_obtained }}){% endif %}
+            {% if c.certificate_url %}
+              <a href="{{ c.certificate_url }}" target="_blank">Certificate</a>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="muted">No certifications added.</div>
+    {% endif %}
+  </div>
+
+  <!-- Social -->
+  <div class="card-soft p-4 mb-5">
+    <h5 class="fw-bold mb-2">Links</h5>
+    <div class="d-flex flex-wrap gap-2">
+      {% if profile.github %}<a class="btn btn-sm btn-outline-dark" target="_blank" href="{{ profile.github }}">GitHub</a>{% endif %}
+      {% if profile.linkedin %}<a class="btn btn-sm btn-outline-primary" target="_blank" href="{{ profile.linkedin }}">LinkedIn</a>{% endif %}
+      {% if profile.website %}<a class="btn btn-sm btn-outline-secondary" target="_blank" href="{{ profile.website }}">Website</a>{% endif %}
+      {% if profile.legacy_website %}<a class="btn btn-sm btn-outline-secondary" target="_blank" href="{{ profile.legacy_website }}">Legacy Website</a>{% endif %}
+      {% if not profile.github and not profile.linkedin and not profile.website and not profile.legacy_website %}
+        <span class="muted">No links provided.</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Views +1 (POST /profiles/student/<id>/increment-profile-views/) -->
+<script>
+  // CSRF helper (Django docs)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie('csrftoken');
+
+  window.addEventListener('load', () => {
+    fetch("{% url 'increment_profile_views' profile_user.id %}", {
+      method: "POST",
+      headers: {"X-CSRFToken": csrftoken}
+    }).catch(() => {});
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
