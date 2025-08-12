@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Register - SmartIntern</title>
+  <title>Lazyintern</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 
@@ -14,60 +14,219 @@
       --blue-600:#2563eb; --teal-600:#0ca678; --purple-600:#7c3aed;
       --ring:rgba(37,99,235,.16); --card:#fff; --border:#eef2f7;
     }
-    html,body{height:100%;}
-    body{
+    html, body { height: 100%; margin: 0; }
+    body {
       font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      color:var(--text);
+      color: var(--text);
       background:
         radial-gradient(1200px 800px at 10% -10%, var(--blue-50), transparent 60%),
         radial-gradient(1200px 800px at 110% 10%, var(--teal-50), transparent 60%),
         var(--bg);
-      display:flex; align-items:center; justify-content:center;
-      padding:24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px 20px;
     }
 
-    .auth-card{width:100%; max-width:480px; border:1px solid var(--border); border-radius:18px; background:var(--card);
-      box-shadow:0 20px 60px -24px var(--ring); overflow:hidden;}
-    .auth-head{text-align:center; padding:28px 22px 10px;}
-    .brand{display:flex; align-items:center; justify-content:center; gap:10px;}
-    .brand-mark{width:64px; height:64px; border-radius:14px; display:grid; place-items:center; overflow:hidden;
-      background:#fff; border:1.5px solid #e5e9f2; box-shadow:0 6px 22px -10px var(--ring);}
-    .brand-mark img{width:100%; height:100%; object-fit:contain; padding:8px;}
-    .brand-text{font-weight:900; font-size:1.3rem; letter-spacing:.2px;
-      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
-      -webkit-background-clip:text; background-clip:text; color:transparent;}
-    .auth-body{padding: 8px 22px 24px;}
+    .auth-card {
+      width: 100%;
+      max-width: 460px;  /* Login ile aynı genişlik */
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      box-shadow: 0 20px 60px -24px var(--ring);
+      overflow: hidden;
+    }
+    .auth-head {
+      text-align: center;
+      padding: 20px 18px 8px; /* biraz daha ince */
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .brand-mark {
+      width: 56px;  /* küçültüldü */
+      height: 56px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #fff;
+      border: 1.5px solid #e5e9f2;
+      box-shadow: 0 6px 22px -10px var(--ring);
+    }
+    .brand-mark img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 6px; /* az miktar azaltıldı */
+    }
+    .brand-text {
+      font-weight: 900;
+      font-size: 1.2rem;  /* biraz küçüldü */
+      letter-spacing: .15px;
+      background: linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .auth-body {
+      padding: 6px 18px 20px;
+    }
 
-    .tabs{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:16px;
-      background:#fafcff; padding:6px; border-radius:12px; border:1px solid var(--border);}
-    .tab-btn{border:none; background:transparent; padding:10px 0; border-radius:10px; font-weight:800; color:var(--muted);}
-    .tab-btn.active{background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
-      color:#fff; box-shadow:0 12px 36px -20px var(--ring);}
-    .tab-btn a{ color:inherit; text-decoration:none; display:block; }
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 12px;
+      background: #fafcff;
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 0;
+      border-radius: 10px;
+      font-weight: 800;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .tab-btn.active {
+      background: linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      color: #fff;
+      box-shadow: 0 12px 36px -20px var(--ring);
+    }
+    .tab-btn a {
+      color: inherit;
+      text-decoration: none;
+      display: block;
+      padding: 8px 0;
+    }
 
-    .form-label{font-weight:700;}
-    .form-control{border-radius:12px; border:1px solid var(--border); padding:.7rem .9rem;}
-    .form-control:focus{box-shadow:0 0 0 .2rem rgba(37,99,235,.08); border-color:#cfe0ff;}
+    /* Dropdown hemen tabların altında */
+    .signup-as {
+      margin-bottom: 16px;
+    }
+    .signup-as label {
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: inline-block;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    .signup-as select {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0.6rem 0.8rem;
+      width: 100%;
+      font-size: 1rem;
+      color: var(--text);
+    }
+    .signup-as select:focus {
+      box-shadow: 0 0 0 0.2rem rgba(37,99,235,.08);
+      border-color: #cfe0ff;
+      outline: none;
+    }
 
-    .errorlist{color:#d92d20; list-style:none; padding-left:0; margin:8px 0 0; font-size:.92rem;}
-    .form-check-input:checked{background-color: var(--teal-600); border-color: var(--teal-600);}
-    .form-check-label{font-weight:700; color:#333;}
+    /* Form elementleri */
+    .form-label {
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    .form-control {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 0.65rem 0.9rem;
+      font-size: 0.95rem;
+    }
+    .form-control:focus {
+      box-shadow: 0 0 0 0.2rem rgba(37,99,235,.08);
+      border-color: #cfe0ff;
+      outline: none;
+    }
 
-    .btn-grad{display:inline-block; width:100%; border:none; color:#fff; font-weight:800;
-      padding:12px 16px; border-radius:12px; text-align:center;
-      background:linear-gradient(90deg, var(--blue-600), var(--teal-600));
-      box-shadow:0 16px 44px -18px var(--ring); margin-top:6px;}
-    .btn-grad:hover{filter:brightness(1.05);}
+    .errorlist {
+      color: #d92d20;
+      list-style: none;
+      padding-left: 0;
+      margin: 6px 0 0;
+      font-size: 0.85rem;
+    }
+    .form-check-input:checked {
+      background-color: var(--teal-600);
+      border-color: var(--teal-600);
+    }
+    .form-check-label {
+      font-weight: 700;
+      color: #333;
+      font-size: 0.9rem;
+    }
 
-    .form-footer{text-align:center; margin-top:14px; color:var(--muted);}
-    .form-footer a{font-weight:700; text-decoration:none;}
-    .form-footer a:hover{text-decoration:underline;}
-    .back-home{text-align:center; margin-top:8px;}
-    .btn-outline-home{display:inline-block; border:1px solid var(--border); color:var(--blue-600); background:#fff;
-      border-radius:12px; padding:10px 16px; text-decoration:none; font-weight:800;
-      box-shadow:0 10px 28px -18px var(--ring);}
-    .btn-outline-home:hover{background:#f8fafc;}
-    .alert{border-radius:12px;}
+    .btn-grad {
+      display: inline-block;
+      width: 100%;
+      border: none;
+      color: #fff;
+      font-weight: 800;
+      padding: 11px 14px;
+      border-radius: 12px;
+      text-align: center;
+      background: linear-gradient(90deg, var(--blue-600), var(--teal-600));
+      box-shadow: 0 16px 44px -18px var(--ring);
+      font-size: 1rem;
+      margin-top: 6px;
+      cursor: pointer;
+      transition: filter 0.2s ease-in-out;
+    }
+    .btn-grad:hover {
+      filter: brightness(1.05);
+    }
+
+    .form-footer {
+      text-align: center;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .form-footer a {
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .form-footer a:hover {
+      text-decoration: underline;
+    }
+
+    .back-home {
+      text-align: center;
+      margin-top: 8px;
+    }
+    .btn-outline-home {
+      display: inline-block;
+      border: 1px solid var(--border);
+      color: var(--blue-600);
+      background: #fff;
+      border-radius: 12px;
+      padding: 9px 14px;
+      text-decoration: none;
+      font-weight: 800;
+      font-size: 0.9rem;
+      box-shadow: 0 10px 28px -18px var(--ring);
+      transition: background-color 0.2s ease-in-out;
+    }
+    .btn-outline-home:hover {
+      background: #f8fafc;
+    }
+
+    .alert {
+      border-radius: 12px;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
   </style>
 </head>
 <body>
@@ -76,9 +235,9 @@
     <div class="auth-head">
       <div class="brand">
         <div class="brand-mark">
-          <img src="{% static 'images/logo.svg' %}" alt="SmartIntern Logo">
+          <img src="{% static 'images/logo.svg.jpg' %}" alt="Lazyintern Logo" />
         </div>
-        <span class="brand-text">SmartIntern</span>
+        <span class="brand-text">LazyIntern</span>
       </div>
     </div>
 
@@ -88,6 +247,15 @@
           <a href="{% url 'login' %}">Login</a>
         </button>
         <button type="button" class="tab-btn active">Sign Up</button>
+      </div>
+
+      <!-- Sign up as dropdown hemen tabların altında -->
+      <div class="signup-as">
+        <label for="signupAs">Sign up as</label>
+        <select id="signupAs" name="user_type" class="form-select" required>
+          <option value="student" selected>Student</option>
+          <option value="company">Company</option>
+        </select>
       </div>
 
       {# 🔔 Mesajlar: Bootstrap alert #}
@@ -195,35 +363,10 @@
           {% endif %}
         </div>
 
-        <!-- User Type Radio Buttons -->
-        <div class="mb-2">
-          <label class="form-label">Register As</label>
-          <div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="user_type" id="studentRadio" value="student"
-                {% if form.user_type.value == 'student' %}checked{% endif %} required>
-              <label class="form-check-label" for="studentRadio">Student</label>
-            </div>
-            <div class="form-check form-check-inline">
-              <input class="form-check-input" type="radio" name="user_type" id="recruiterRadio" value="recruiter"
-                {% if form.user_type.value == 'recruiter' %}checked{% endif %} required>
-              <label class="form-check-label" for="recruiterRadio">Recruiter</label>
-            </div>
-          </div>
-          {% if form.user_type.errors %}
-            <ul class="errorlist">
-              {% for error in form.user_type.errors %}
-                <li>{{ error }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </div>
-
         <button type="submit" class="btn-grad w-100 mt-2">Register</button>
       </form>
 
       <div class="form-footer">
-        <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>
       </div>
       <div class="back-home">
         <a href="{% url 'home' %}" class="btn-outline-home">← Back to Home</a>
