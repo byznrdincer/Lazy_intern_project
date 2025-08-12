@@ -95,29 +95,21 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
 
         if form.is_valid():
-            email_or_username = form.cleaned_data.get('username')
+            username = form.cleaned_data.get('username')  # Sadece username al
             password = form.cleaned_data.get('password')
-
-            # Email ile giriş desteği
-            try:
-                user_obj = User.objects.get(email=email_or_username)
-                username = user_obj.username
-            except User.DoesNotExist:
-                username = email_or_username
 
             user = authenticate(request, username=username, password=password)
             if user is None:
                 messages.error(request, "Authentication failed.")
                 return render(request, 'accounts/login.html', {'form': form})
 
-            # Hesabın gerçek tipi
             has_company = Company.objects.filter(user=user).exists()
 
             if user_type == 'student':
                 if has_company:
                     messages.error(request, "This is a company account; cannot log in as 'Student'.")
                     return redirect('login')
-             
+
                 login(request, user)
                 Profile.objects.get_or_create(user=user)
                 return redirect('profile_detail', username=user.username)
@@ -126,7 +118,7 @@ def login_view(request):
                 if not has_company:
                     messages.error(request, "This is a student account; cannot log in as 'Company'.")
                     return redirect('login')
-                # Company -> login + şirket dashboard (MESAJ YOK)
+
                 login(request, user)
                 company = _get_or_prepare_company_for_user(user)
                 return redirect('company_profile', slug=company.slug)
@@ -139,10 +131,8 @@ def login_view(request):
             messages.error(request, "Invalid username or password.")
             return render(request, 'accounts/login.html', {'form': form})
 
-    # GET
     form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
-
 
 @login_required
 def logout_view(request):
