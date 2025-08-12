@@ -71,6 +71,7 @@
       padding: 12px 16px; border-radius: 12px; text-align: center;
       background: linear-gradient(90deg, var(--blue-600), var(--teal-600));
       box-shadow: 0 16px 44px -18px var(--ring);
+      cursor: pointer;
     }
     .btn-grad:hover { filter: brightness(1.05); }
     .btn-outline-home {
@@ -106,16 +107,7 @@
       </button>
     </div>
 
-    <!-- Login as dropdown -->
-    <div class="mb-3">
-      <label for="loginAs" class="form-label">Login as</label>
-      <select id="loginAs" name="user_type" class="form-select" onchange="updateButtonText()">
-        <option value="student">Student</option>
-        <option value="company">Company</option>
-      </select>
-    </div>
-
-    <!-- Toast Messages -->
+    <!-- Mesajlar -->
     {% if messages %}
       <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
         {% for message in messages %}
@@ -142,18 +134,24 @@
     <!-- Form -->
     <form method="post" id="loginForm">
       {% csrf_token %}
-      <input type="hidden" name="user_type_hidden" id="user_type_hidden" value="student" />
+
+      <!-- Login as dropdown (sekme altı, username üstü) -->
+      <div class="mb-3">
+        <label for="loginAs" class="form-label">Login as</label>
+        <select id="loginAs" name="user_type" class="form-select" onchange="updateButtonText()">
+          <option value="student">Student</option>
+          <option value="company">Company</option>
+        </select>
+      </div>
 
       <div class="mb-3">
         <label for="id_username" class="form-label">Username</label>
-        <input type="text" name="username" autofocus required id="id_username"
-               class="form-control" placeholder="username" />
+        <input type="text" name="username" autofocus required id="id_username" class="form-control" placeholder="username" />
       </div>
 
       <div class="mb-2">
         <label for="id_password" class="form-label">Password</label>
-        <input type="password" name="password" required id="id_password"
-               class="form-control" placeholder="••••••••" />
+        <input type="password" name="password" required id="id_password" class="form-control" placeholder="••••••••" />
       </div>
 
       <button type="submit" id="loginButton" class="btn-grad">Login as Student</button>
@@ -176,14 +174,12 @@
   function updateButtonText() {
     const select = document.getElementById('loginAs');
     const button = document.getElementById('loginButton');
-    const hidden = document.getElementById('user_type_hidden');
 
     if (select.value === 'student') {
       button.textContent = 'Login as Student';
     } else {
       button.textContent = 'Login as Company';
     }
-    hidden.value = select.value;
   }
 </script>
 </body>

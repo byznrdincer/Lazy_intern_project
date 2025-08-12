@@ -30,7 +30,7 @@
 
     .auth-card {
       width: 100%;
-      max-width: 460px;  /* Login ile aynı genişlik */
+      max-width: 460px;
       border: 1px solid var(--border);
       border-radius: 18px;
       background: var(--card);
@@ -39,7 +39,7 @@
     }
     .auth-head {
       text-align: center;
-      padding: 20px 18px 8px; /* biraz daha ince */
+      padding: 20px 18px 8px;
     }
     .brand {
       display: flex;
@@ -48,7 +48,7 @@
       gap: 8px;
     }
     .brand-mark {
-      width: 56px;  /* küçültüldü */
+      width: 56px;
       height: 56px;
       border-radius: 14px;
       display: grid;
@@ -62,11 +62,11 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      padding: 6px; /* az miktar azaltıldı */
+      padding: 6px;
     }
     .brand-text {
       font-weight: 900;
-      font-size: 1.2rem;  /* biraz küçüldü */
+      font-size: 1.2rem;
       letter-spacing: .15px;
       background: linear-gradient(90deg, var(--blue-600), var(--teal-600));
       -webkit-background-clip: text;
@@ -108,7 +108,6 @@
       padding: 8px 0;
     }
 
-    /* Dropdown hemen tabların altında */
     .signup-as {
       margin-bottom: 16px;
     }
@@ -133,7 +132,6 @@
       outline: none;
     }
 
-    /* Form elementleri */
     .form-label {
       font-weight: 700;
       font-size: 0.9rem;
@@ -157,16 +155,6 @@
       margin: 6px 0 0;
       font-size: 0.85rem;
     }
-    .form-check-input:checked {
-      background-color: var(--teal-600);
-      border-color: var(--teal-600);
-    }
-    .form-check-label {
-      font-weight: 700;
-      color: #333;
-      font-size: 0.9rem;
-    }
-
     .btn-grad {
       display: inline-block;
       width: 100%;
@@ -185,41 +173,6 @@
     }
     .btn-grad:hover {
       filter: brightness(1.05);
-    }
-
-    .form-footer {
-      text-align: center;
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    .form-footer a {
-      font-weight: 700;
-      text-decoration: none;
-    }
-    .form-footer a:hover {
-      text-decoration: underline;
-    }
-
-    .back-home {
-      text-align: center;
-      margin-top: 8px;
-    }
-    .btn-outline-home {
-      display: inline-block;
-      border: 1px solid var(--border);
-      color: var(--blue-600);
-      background: #fff;
-      border-radius: 12px;
-      padding: 9px 14px;
-      text-decoration: none;
-      font-weight: 800;
-      font-size: 0.9rem;
-      box-shadow: 0 10px 28px -18px var(--ring);
-      transition: background-color 0.2s ease-in-out;
-    }
-    .btn-outline-home:hover {
-      background: #f8fafc;
     }
 
     .alert {
@@ -249,33 +202,32 @@
         <button type="button" class="tab-btn active">Sign Up</button>
       </div>
 
-      <!-- Sign up as dropdown hemen tabların altında -->
-      <div class="signup-as">
-        <label for="signupAs">Sign up as</label>
-        <select id="signupAs" name="user_type" class="form-select" required>
-          <option value="student" selected>Student</option>
-          <option value="company">Company</option>
-        </select>
-      </div>
-
-      {# 🔔 Mesajlar: Bootstrap alert #}
-      {% if messages %}
-        <div class="mb-3">
-          {% for m in messages %}
-            <div class="alert alert-dismissible fade show
-                        {% if 'error' in m.tags %} alert-danger
-                        {% elif 'warning' in m.tags %} alert-warning
-                        {% elif 'success' in m.tags %} alert-success
-                        {% else %} alert-info {% endif %}" role="alert">
-              {{ m }}
-              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-          {% endfor %}
-        </div>
-      {% endif %}
-
+      <!-- SIGN UP FORM -->
       <form method="post" action="{% url 'register' %}" novalidate>
         {% csrf_token %}
+
+        <div class="signup-as">
+          <label for="signupAs">Sign up as</label>
+          <select id="signupAs" name="user_type" class="form-select" required>
+            <option value="student" {% if request.POST.user_type == 'student' %}selected{% endif %}>Student</option>
+            <option value="company" {% if request.POST.user_type == 'company' %}selected{% endif %}>Company</option>
+          </select>
+        </div>
+
+        {% if messages %}
+          <div class="mb-3">
+            {% for m in messages %}
+              <div class="alert alert-dismissible fade show
+                          {% if 'error' in m.tags %} alert-danger
+                          {% elif 'warning' in m.tags %} alert-warning
+                          {% elif 'success' in m.tags %} alert-success
+                          {% else %} alert-info {% endif %}" role="alert">
+                {{ m }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
 
         {% if form.non_field_errors %}
           <ul class="errorlist">
@@ -366,8 +318,7 @@
         <button type="submit" class="btn-grad w-100 mt-2">Register</button>
       </form>
 
-      <div class="form-footer">
-      </div>
+      <div class="form-footer"></div>
       <div class="back-home">
         <a href="{% url 'home' %}" class="btn-outline-home">← Back to Home</a>
       </div>

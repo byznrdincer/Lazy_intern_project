@@ -1,4 +1,3 @@
-# accounts/views.py
 from urllib.parse import urlencode
 from datetime import timedelta
 import secrets
@@ -10,7 +9,6 @@ from django.contrib import messages
 from django.urls import reverse
 from django.utils.text import slugify
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.utils import timezone
 from django.views.decorators.http import require_POST
 
@@ -47,7 +45,6 @@ def _get_or_prepare_company_for_user(user) -> Company:
 
 
 def _company_email(company: Company) -> str | None:
-    # Önce company.contact_email, yoksa company.user.email
     if getattr(company, "contact_email", None):
         return company.contact_email
     if company.user and company.user.email:
@@ -66,21 +63,20 @@ def register_view(request):
             user_type = request.POST.get('user_type')
 
             if user_type == 'student':
-                # Öğrenci: profil oluştur, login yapma; login sayfasına yönlendir
                 Profile.objects.get_or_create(user=user)
                 messages.success(request, 'Registration successful. Please log in.')
                 return redirect('login')
 
             elif user_type in ['company', 'recruiter']:
-                # Şirket/recruiter: company hazırla, login yap, verify sayfasına gönder
-                _get_or_prepare_company_for_user(user)
+                company = _get_or_prepare_company_for_user(user)
                 login(request, user)
                 params = {'next': reverse('login'), 'just_registered': '1'}
-                return redirect(f"{reverse('company_verify_email')}?{urlencode(params)}")
+                url = reverse('company_email_verify', kwargs={'slug': company.slug})
+                return redirect(f"{url}?{urlencode(params)}")
 
-            # Belirsiz durum: güvenli varsayılan
             messages.success(request, 'Registration successful. Please log in.')
             return redirect('login')
+
         else:
             messages.error(request, 'Registration failed. Please correct the errors.')
     else:
@@ -94,8 +90,12 @@ def login_view(request):
         user_type = request.POST.get('user_type')
         form = AuthenticationForm(request, data=request.POST)
 
+        if not user_type:
+            messages.error(request, "Please select a user type.")
+            return render(request, 'accounts/login.html', {'form': form})
+
         if form.is_valid():
-            username = form.cleaned_data.get('username')  # Sadece username al
+            username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
 
             user = authenticate(request, username=username, password=password)
@@ -108,31 +108,33 @@ def login_view(request):
             if user_type == 'student':
                 if has_company:
                     messages.error(request, "This is a company account; cannot log in as 'Student'.")
-                    return redirect('login')
+                    return render(request, 'accounts/login.html', {'form': form})
 
                 login(request, user)
                 Profile.objects.get_or_create(user=user)
                 return redirect('profile_detail', username=user.username)
 
-            elif user_type in ['company', 'recruiter']:
+            elif user_type == 'company':
                 if not has_company:
                     messages.error(request, "This is a student account; cannot log in as 'Company'.")
-                    return redirect('login')
+                    return render(request, 'accounts/login.html', {'form': form})
 
                 login(request, user)
-                company = _get_or_prepare_company_for_user(user)
+                company = Company.objects.filter(user=user).first()
                 return redirect('company_profile', slug=company.slug)
 
             else:
-                messages.error(request, "Please select a user type.")
-                return redirect('login')
+                messages.error(request, "Invalid user type selected.")
+                return render(request, 'accounts/login.html', {'form': form})
 
         else:
             messages.error(request, "Invalid username or password.")
             return render(request, 'accounts/login.html', {'form': form})
 
-    form = AuthenticationForm()
+    else:
+        form = AuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
+
 
 @login_required
 def logout_view(request):
@@ -176,13 +178,11 @@ def company_send_verification_code(request, slug):
     if not company:
         return redirect("home")
 
-    # Formdan e-posta geldiyse kaydet
     email_from_form = (request.POST.get("verification_email") or "").strip()
     if email_from_form and getattr(company, "contact_email", None) != email_from_form:
         company.contact_email = email_from_form
         company.save(update_fields=["contact_email"])
 
-    # 6 haneli kod üret
     code = "".join(secrets.choice("0123456789") for _ in range(6))
     company.verification_code = code
     company.verification_expires_at = timezone.now() + timedelta(minutes=10)
