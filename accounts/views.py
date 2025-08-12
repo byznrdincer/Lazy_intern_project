@@ -1,3 +1,4 @@
+# accounts/views.py
 from urllib.parse import urlencode
 from datetime import timedelta
 import secrets
@@ -18,15 +19,11 @@ from profiles.models import Profile, Company
 from .email_utils import send_company_verification_email
 
 
-
 # -------------------------------
 # Company yardımcıları
 # -------------------------------
 def _unique_company_slug_for_user(user) -> str:
-    base = (
-        slugify(user.username or (user.email.split("@")[0] if user.email else ""))  # base
-        or f"company-{user.id}"
-    )
+    base = slugify(user.username or (user.email.split("@")[0] if user.email else "")) or f"company-{user.id}"
     slug = base
     i = 2
     while Company.objects.filter(slug=slug).exists():
@@ -66,28 +63,32 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             user = form.save()
-            login(request, user)
-
             user_type = request.POST.get('user_type')
 
             if user_type == 'student':
+                # Öğrenci: profil oluştur, login yapma; login sayfasına yönlendir
                 Profile.objects.get_or_create(user=user)
-                messages.success(request, 'Registration successful.')
-                return redirect('home')
+                messages.success(request, 'Registration successful. Please log in.')
+                return redirect('login')
 
             elif user_type in ['company', 'recruiter']:
+                # Şirket/recruiter: company hazırla, login yap, verify sayfasına gönder
                 _get_or_prepare_company_for_user(user)
-                # doğrulama girişine gönder; iş bitince anasayfaya dönsün
-                params = {'next': reverse('home')}
+                login(request, user)
+                params = {'next': reverse('login'), 'just_registered': '1'}
                 return redirect(f"{reverse('company_verify_email')}?{urlencode(params)}")
 
-            messages.success(request, 'Registration successful.')
-            return redirect('home')
+            # Belirsiz durum: güvenli varsayılan
+            messages.success(request, 'Registration successful. Please log in.')
+            return redirect('login')
         else:
             messages.error(request, 'Registration failed. Please correct the errors.')
     else:
         form = RegisterForm()
+
     return render(request, 'accounts/register.html', {'form': form})
+
+
 def login_view(request):
     if request.method == 'POST':
         user_type = request.POST.get('user_type')
@@ -97,7 +98,7 @@ def login_view(request):
             email_or_username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
 
-            # Email login support
+            # Email ile giriş desteği
             try:
                 user_obj = User.objects.get(email=email_or_username)
                 username = user_obj.username
@@ -109,27 +110,25 @@ def login_view(request):
                 messages.error(request, "Authentication failed.")
                 return render(request, 'accounts/login.html', {'form': form})
 
-            # STRICT CHECK: enforce actual account type based on radio selection
+            # Hesabın gerçek tipi
             has_company = Company.objects.filter(user=user).exists()
 
             if user_type == 'student':
                 if has_company:
                     messages.error(request, "This is a company account; cannot log in as 'Student'.")
                     return redirect('login')
-                # student account → login + student profile
+             
                 login(request, user)
                 Profile.objects.get_or_create(user=user)
-                messages.success(request, "Login successful.")
                 return redirect('profile_detail', username=user.username)
 
             elif user_type in ['company', 'recruiter']:
                 if not has_company:
                     messages.error(request, "This is a student account; cannot log in as 'Company'.")
                     return redirect('login')
-                # company account → login + company panel
+                # Company -> login + şirket dashboard (MESAJ YOK)
                 login(request, user)
                 company = _get_or_prepare_company_for_user(user)
-                messages.success(request, "Login successful.")
                 return redirect('company_profile', slug=company.slug)
 
             else:
@@ -140,9 +139,10 @@ def login_view(request):
             messages.error(request, "Invalid username or password.")
             return render(request, 'accounts/login.html', {'form': form})
 
-    else:
-        form = AuthenticationForm()
-        return render(request, 'accounts/login.html', {'form': form})
+    # GET
+    form = AuthenticationForm()
+    return render(request, 'accounts/login.html', {'form': form})
+
 
 @login_required
 def logout_view(request):
@@ -158,8 +158,7 @@ def logout_view(request):
 def company_verify_entry(request):
     """
     /accounts/company/verify-email/ -> kullanıcıya ait şirketin
-    /profiles/company/<slug>/verify/ sayfasına yönlendirir.
-    (Bu sayfanın kendisi de aşağıdaki company_email_verify ile servis edilir.)
+    /accounts/company/<slug>/verify/ sayfasına yönlendirir.
     """
     company = _get_or_prepare_company_for_user(request.user)
 
@@ -167,6 +166,9 @@ def company_verify_entry(request):
     nxt = request.GET.get("next")
     if nxt:
         params["next"] = nxt
+    jr = request.GET.get("just_registered")
+    if jr:
+        params["just_registered"] = jr
 
     url = reverse("company_email_verify", kwargs={"slug": company.slug})
     if params:
@@ -175,7 +177,7 @@ def company_verify_entry(request):
 
 
 # -------------------------------
-# (TAŞINDI) Şirket e-posta doğrulaması: kod gönder
+# Şirket e-posta doğrulaması: kod gönder (POST)
 # -------------------------------
 @login_required
 @require_POST
@@ -214,7 +216,7 @@ def company_send_verification_code(request, slug):
 
 
 # -------------------------------
-# (TAŞINDI) Şirket e-posta doğrulaması: kodu gir & doğrula
+# Şirket e-posta doğrulaması: kodu gir & doğrula
 # -------------------------------
 @login_required
 def company_email_verify(request, slug):
@@ -243,7 +245,8 @@ def company_email_verify(request, slug):
                 "is_verified", "verified_at", "verification_code", "verification_expires_at"
             ])
 
-            next_url = request.GET.get("next") or request.POST.get("next") or reverse("home")
+            messages.success(request, "Email verified. You can now log in.")
+            next_url = request.GET.get("next") or request.POST.get("next") or reverse("login")
             return redirect(next_url)
 
     return render(request, "accounts/company_verify_email.html", ctx)

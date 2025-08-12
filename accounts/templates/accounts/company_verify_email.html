@@ -17,6 +17,15 @@
   <h1 class="h4 mb-3">Verify Company Email</h1>
   <p class="text-muted mb-4">Company: <strong>{{ company.name }}</strong></p>
 
+  <!-- ✅ Kayıttan gelindiyse sabit başarı uyarısı -->
+  {% if request.GET.just_registered %}
+    <div class="alert alert-success">
+      Registration successful. Please verify your company email to continue.
+      We sent a 6-digit code to <strong>{{ company.contact_email|default:company.user.email }}</strong>.
+    </div>
+  {% endif %}
+
+  <!-- Django messages (opsiyonel, ekstra bildirimler için) -->
   {% if messages %}
     <div class="mb-3">
       {% for m in messages %}
@@ -25,7 +34,7 @@
     </div>
   {% endif %}
 
-  <!-- 1) Kod Gönderme -->
+  <!-- 1) Send code -->
   <div class="card-soft p-4 mb-4">
     <h5 class="fw-bold">1) Send a code</h5>
     <form method="post" action="{% url 'company_send_verification_code' slug=company.slug %}" class="row g-2 mt-2">
@@ -42,7 +51,7 @@
     <div class="form-text mt-1">The code is valid for {{ ttl_minutes|default:'10' }} minutes.</div>
   </div>
 
-  <!-- 2) Kod Doğrulama -->
+  <!-- 2) Verify code -->
   <div class="card-soft p-4">
     <h5 class="fw-bold">2) Enter the code</h5>
     <form method="post" action="{% url 'company_email_verify' slug=company.slug %}" class="row g-2 mt-2">
@@ -56,6 +65,7 @@
         <button class="btn btn-success" type="submit">Verify</button>
       </div>
     </form>
+
     {% if company.is_verified %}
       <div class="alert alert-success mt-3 mb-0">Already verified ✅</div>
     {% endif %}
