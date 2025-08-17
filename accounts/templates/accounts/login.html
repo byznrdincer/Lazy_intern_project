@@ -3,10 +3,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login - lazyIntern</title>
+  <title>Login - LazyIntern</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
-
   <style>
     :root{
       --bg:#ffffff; --text:#0b1324; --muted:#5b6b7a;
@@ -92,14 +91,13 @@
   <div class="auth-head">
     <div class="brand">
       <div class="brand-mark">
-        <img src="{% static 'images/logo.svg.jpg' %}" alt="lazyIntern Logo" />
+        <img src="{% static 'images/logo.svg.jpg' %}" alt="LazyIntern Logo" />
       </div>
       <span class="brand-text">LazyIntern</span>
     </div>
   </div>
 
   <div class="auth-body">
-    <!-- Sekmeler -->
     <div class="tabs">
       <button type="button" class="tab-btn active">Login</button>
       <button type="button" class="tab-btn">
@@ -109,25 +107,8 @@
 
     <!-- Mesajlar -->
     {% if messages %}
-      <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
-        {% for message in messages %}
-          {% if 'success' in message.tags %}
-            <div class="toast align-items-center text-bg-{{ message.tags }} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-              <div class="d-flex">
-                <div class="toast-body">{{ message }}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
-              </div>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endif %}
-
-    {% if messages %}
       {% for message in messages %}
-        {% if 'success' not in message.tags %}
-          <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-        {% endif %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
 
@@ -135,18 +116,18 @@
     <form method="post" id="loginForm">
       {% csrf_token %}
 
-      <!-- Login as dropdown (sekme altı, username üstü) -->
+      <!-- Login as dropdown -->
       <div class="mb-3">
         <label for="loginAs" class="form-label">Login as</label>
         <select id="loginAs" name="user_type" class="form-select" onchange="updateButtonText()">
           <option value="student">Student</option>
-          <option value="company">Company</option>
+          <option value="company">Recruiter</option>
         </select>
       </div>
 
       <div class="mb-3">
-        <label for="id_username" class="form-label">Username</label>
-        <input type="text" name="username" autofocus required id="id_username" class="form-control" placeholder="username" />
+        <label for="id_email" class="form-label">Email</label>
+        <input type="email" name="email" autofocus required id="id_email" class="form-control" placeholder="email@example.com" />
       </div>
 
       <div class="mb-2">
@@ -155,6 +136,20 @@
       </div>
 
       <button type="submit" id="loginButton" class="btn-grad">Login as Student</button>
+
+      <!-- Form errors -->
+      {% if form.errors %}
+        <div class="alert alert-danger mt-2">
+          {% for field in form %}
+            {% for error in field.errors %}
+              <div>{{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+          {% for error in form.non_field_errors %}
+            <div>{{ error }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
     </form>
 
     <div class="form-footer">
@@ -165,21 +160,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.toast').forEach(function (toastEl) {
-      new bootstrap.Toast(toastEl).show();
-    });
-  });
-
   function updateButtonText() {
     const select = document.getElementById('loginAs');
     const button = document.getElementById('loginButton');
-
-    if (select.value === 'student') {
-      button.textContent = 'Login as Student';
-    } else {
-      button.textContent = 'Login as Company';
-    }
+    button.textContent = select.value === 'student' ? 'Login as Student' : 'Login as Company';
   }
 </script>
 </body>
