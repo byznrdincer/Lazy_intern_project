@@ -210,7 +210,7 @@
           <label for="signupAs">Sign up as</label>
           <select id="signupAs" name="user_type" class="form-select" required>
             <option value="student" {% if request.POST.user_type == 'student' %}selected{% endif %}>Student</option>
-            <option value="company" {% if request.POST.user_type == 'company' %}selected{% endif %}>Company</option>
+            <option value="company" {% if request.POST.user_type == 'company' %}selected{% endif %}>Recruiter</option>
           </select>
         </div>
 

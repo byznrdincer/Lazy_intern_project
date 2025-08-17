@@ -15,6 +15,13 @@ from django.views.decorators.http import require_POST
 from .forms import RegisterForm
 from profiles.models import Profile, Company
 from .email_utils import send_company_verification_email
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.contrib import messages
+from profiles.models import Profile, Company
+from .forms import EmailLoginForm
+
 
 
 # -------------------------------
@@ -86,55 +93,59 @@ def register_view(request):
 
 
 def login_view(request):
-    if request.method == 'POST':
-        user_type = request.POST.get('user_type')
-        form = AuthenticationForm(request, data=request.POST)
+    if request.method == "POST":
+        form = EmailLoginForm(request.POST)
+        user_type = request.POST.get("user_type")
 
         if not user_type:
             messages.error(request, "Please select a user type.")
-            return render(request, 'accounts/login.html', {'form': form})
+            return render(request, "accounts/login.html", {"form": form})
 
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+            email = form.cleaned_data["email"]
+            password = form.cleaned_data["password"]
 
-            user = authenticate(request, username=username, password=password)
+            # Birden fazla kullanıcı kontrolü
+            users = User.objects.filter(email__iexact=email)
+            if not users.exists():
+                messages.error(request, "Invalid email or password.")
+                return render(request, "accounts/login.html", {"form": form})
+
+            if users.count() > 1:
+                messages.warning(request, "Multiple accounts found with this email. Logging in with the first one.")
+
+            user_obj = users.first()
+            user = authenticate(request, username=user_obj.username, password=password)
             if user is None:
-                messages.error(request, "Authentication failed.")
-                return render(request, 'accounts/login.html', {'form': form})
+                messages.error(request, "Invalid email or password.")
+                return render(request, "accounts/login.html", {"form": form})
 
+            # company/student yönlendirmesi
             has_company = Company.objects.filter(user=user).exists()
-
-            if user_type == 'student':
+            if user_type == "student":
                 if has_company:
                     messages.error(request, "This is a company account; cannot log in as 'Student'.")
-                    return render(request, 'accounts/login.html', {'form': form})
-
+                    return render(request, "accounts/login.html", {"form": form})
                 login(request, user)
                 Profile.objects.get_or_create(user=user)
-                return redirect('profile_detail', username=user.username)
-
-            elif user_type == 'company':
+                return redirect("profile_detail", username=user.username)
+            elif user_type == "company":
                 if not has_company:
                     messages.error(request, "This is a student account; cannot log in as 'Company'.")
-                    return render(request, 'accounts/login.html', {'form': form})
-
+                    return render(request, "accounts/login.html", {"form": form})
                 login(request, user)
                 company = Company.objects.filter(user=user).first()
-                return redirect('company_profile', slug=company.slug)
-
+                return redirect("company_profile", slug=company.slug)
             else:
-                messages.error(request, "Invalid user type selected.")
-                return render(request, 'accounts/login.html', {'form': form})
-
+                messages.error(request, "Please select a valid user type.")
+                return render(request, "accounts/login.html", {"form": form})
         else:
-            messages.error(request, "Invalid username or password.")
-            return render(request, 'accounts/login.html', {'form': form})
-
+            messages.error(request, "Please correct the errors below.")
+            return render(request, "accounts/login.html", {"form": form})
     else:
-        form = AuthenticationForm()
-    return render(request, 'accounts/login.html', {'form': form})
+        form = EmailLoginForm()
 
+    return render(request, "accounts/login.html", {"form": form})
 
 @login_required
 def logout_view(request):
