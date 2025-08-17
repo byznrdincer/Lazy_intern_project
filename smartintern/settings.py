@@ -25,7 +25,7 @@ def env_list(key: str, default: list[str] | None = None) -> list[str]:
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "django-insecure-change-me")
 DEBUG = env_bool("DJANGO_DEBUG", True)
 
-ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["*"])
+ALLOWED_HOSTS = ["*"]
 
 # CSRF / Cookies
 CSRF_TRUSTED_ORIGINS = env_list(
@@ -94,24 +94,16 @@ WSGI_APPLICATION = "smartintern.wsgi.application"
 #   POSTGRES_PORT=5432
 DB_ENGINE = os.getenv("DB_ENGINE", "sqlite")
 
-if DB_ENGINE == "postgresql":
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("POSTGRES_DB", ""),
-            "USER": os.getenv("POSTGRES_USER", ""),
-            "PASSWORD": os.getenv("POSTGRES_PASSWORD", ""),
-            "HOST": os.getenv("POSTGRES_HOST", "localhost"),
-            "PORT": os.getenv("POSTGRES_PORT", "5432"),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': '/cloudsql/lazyintern-468907:asia-south1:lazyintern-mysql',
+        'PORT': '3306',
+        'USER': 'root',
+        'PASSWORD': 'lazyIntern@123',
+        'NAME': 'lazyintern-db',
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 # --------- Password validation ----------
 AUTH_PASSWORD_VALIDATORS = [
