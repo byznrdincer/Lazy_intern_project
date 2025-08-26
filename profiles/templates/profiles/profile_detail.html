@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -137,21 +137,21 @@
         <div class="col-md-3">
             <div class="card-box bg-blue text-center">
                 <h5>Profile Views</h5>
-                <h2>{{ profile_views }}</h2>
+                <h2>{{ profile_views|default:"0" }}</h2>
                 <p>Total Views</p>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card-box bg-green text-center">
                 <h5>Skills Added</h5>
-                <h2>{{ skills_count }}</h2>
+                <h2>{{ skills_count|default:"0" }}</h2>
                 <p>Keep adding more!</p>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card-box bg-purple text-center">
                 <h5>Projects</h5>
-                <h2>{{ projects_count }}</h2>
+                <h2>{{ projects_count|default:"0" }}</h2>
                 <p>Showcase your work</p>
             </div>
         </div>
@@ -159,19 +159,12 @@
             <div class="profile-progress">
                 <h5>Profile Completion</h5>
                 <div class="progress mb-2">
-                    <!-- bg-danger kaldırıldı ki gradient çalışsın -->
-                    <div class="progress-bar" style="width: {{ completion_percent }}%;">{{ completion_percent }}%</div>
+                    <div class="progress-bar" style="width: {{ completion_percent|default:"0" }}%;">{{ completion_percent|default:"0" }}%</div>
                 </div>
                 <ul>
-                    {% if not profile.bio %}
-                    <li>Add a bio</li>
-                    {% endif %}
-                    {% if not profile.location %}
-                    <li>Add location</li>
-                    {% endif %}
-                    {% if skills_count == 0 %}
-                    <li>Add skills</li>
-                    {% endif %}
+                    {% if not profile.bio %}<li>Add a bio</li>{% endif %}
+                    {% if not profile.location %}<li>Add location</li>{% endif %}
+                    {% if skills_count|default:0 == 0 %}<li>Add skills</li>{% endif %}
                 </ul>
             </div>
         </div>
@@ -185,12 +178,12 @@
             <div class="mb-3">
                 <label for="full_name" class="form-label">Full Name *</label>
                 <input type="text" id="full_name" name="full_name" class="form-control" 
-                       value="{{ full_name }}" required>
+                       value="{{ full_name|default_if_none:'' }}" required>
             </div>
             <div class="mb-3">
                 <label for="email" class="form-label">Email Address *</label>
                 <input type="email" id="email" name="email" class="form-control" 
-                       value="{{ profile_user.email }}" placeholder="Enter your email address" required>
+                       value="{{ profile_user.email|default_if_none:'' }}" placeholder="Enter your email address" required>
                 <small class="text-muted">This email will be used by recruiters to contact you directly</small>
             </div>
 
@@ -198,12 +191,12 @@
                 <div class="col-md-6 mb-3">
                     <label for="university" class="form-label">University *</label>
                     <input type="text" id="university" name="university" class="form-control" 
-                           placeholder="Enter your university name" value="{{ profile.university }}" required>
+                           placeholder="Enter your university name" value="{{ profile.university|default_if_none:'' }}" required>
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="major" class="form-label">Major/Field of Study *</label>
                     <input type="text" id="major" name="major" class="form-control" 
-                           placeholder="e.g., Computer Science, Mechanical Engineering" value="{{ profile.major }}" required>
+                           placeholder="e.g., Computer Science, Mechanical Engineering" value="{{ profile.major|default_if_none:'' }}" required>
                 </div>
             </div>
 
@@ -220,14 +213,14 @@
                 <div class="col-md-6 mb-3">
                     <label for="location" class="form-label">Current Location</label>
                     <input type="text" id="location" name="location" class="form-control" 
-                           placeholder="City, State/Country" value="{{ profile.location }}">
+                           placeholder="City, State/Country" value="{{ profile.location|default_if_none:'' }}">
                 </div>
             </div>
 
             <div class="mb-3">
                 <label for="bio" class="form-label">Bio/About Me</label>
                 <textarea id="bio" name="bio" class="form-control" rows="4" 
-                          placeholder="Tell recruiters about yourself, your interests, and career goals...">{{ profile.bio }}</textarea>
+                          placeholder="Tell recruiters about yourself, your interests, and career goals...">{{ profile.bio|default_if_none:'' }}</textarea>
             </div>
 
             <button type="submit" class="btn btn-primary" name="profile_submit">Save Changes</button>
@@ -241,20 +234,20 @@
             {% csrf_token %}
             <div class="mb-3">
                 <label for="github" class="form-label">GitHub URL</label>
-                <input type="url" id="github" name="github" class="form-control" placeholder="https://github.com/yourusername" value="{{ profile.github }}">
+                <input type="url" id="github" name="github" class="form-control" placeholder="https://github.com/yourusername" value="{{ profile.github|default_if_none:'' }}">
             </div>
             <div class="mb-3">
                 <label for="linkedin" class="form-label">LinkedIn URL</label>
-                <input type="url" id="linkedin" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/yourusername" value="{{ profile.linkedin }}">
+                <input type="url" id="linkedin" name="linkedin" class="form-control" placeholder="https://linkedin.com/in/yourusername" value="{{ profile.linkedin|default_if_none:'' }}">
             </div>
             <div class="mb-3">
                 <label for="website" class="form-label">Website/Portfolio URLs</label>
-                <input type="url" id="website" name="website" class="form-control" placeholder="Add Website" value="{{ profile.website }}">
+                <input type="url" id="website" name="website" class="form-control" placeholder="Add Website" value="{{ profile.website|default_if_none:'' }}">
                 <small class="text-muted">Add your portfolio, personal websites, or other relevant links.</small>
             </div>
             <div class="mb-3">
                 <label for="legacy_website" class="form-label">Legacy Website URL (for backward compatibility)</label>
-                <input type="url" id="legacy_website" name="legacy_website" class="form-control" placeholder="https://yourwebsite.com" value="{{ profile.legacy_website }}">
+                <input type="url" id="legacy_website" name="legacy_website" class="form-control" placeholder="https://yourwebsite.com" value="{{ profile.legacy_website|default_if_none:'' }}">
                 <small class="text-muted">This field is kept for backward compatibility. Use the "Website/Portfolio URLs" section above for multiple links.</small>
             </div>
 
@@ -279,7 +272,7 @@
 
             <div class="mb-3">
                 <label for="preferred_locations" class="form-label">Preferred Internship Locations</label>
-                <input type="text" id="preferred_locations" name="preferred_locations" class="form-control" placeholder="Add Location" value="{{ profile.preferred_locations }}">
+                <input type="text" id="preferred_locations" name="preferred_locations" class="form-control" placeholder="Add Location" value="{{ profile.preferred_locations|default_if_none:'' }}">
                 <small class="text-muted">Help recruiters understand your preferred internship locations.</small>
             </div>
 
@@ -328,16 +321,14 @@
             </form>
         </div>
 
-        {% if projects_count == 0 %}
+        {% if projects_count|default:0 == 0 %}
             <p>No projects added yet. Click "Add Project" to showcase your work!</p>
         {% else %}
             <ul>
                 {% for project in profile.projects.all %}
                     <li>
-                        <strong>{{ project.title }}</strong> - {{ project.technologies }} 
-                        {% if project.link %}
-                            (<a href="{{ project.link }}" target="_blank">Link</a>)
-                        {% endif %}
+                        <strong>{{ project.title|default_if_none:'' }}</strong> - {{ project.technologies|default_if_none:'' }} 
+                        {% if project.link %}(<a href="{{ project.link }}" target="_blank">Link</a>){% endif %}
                     </li>
                 {% endfor %}
             </ul>
@@ -347,7 +338,7 @@
 
     <!-- Certifications -->
     <div class="card mb-4 p-4">
-        <h4 class="section-title">Certifications ({{ certifications_count }})</h4>
+        <h4 class="section-title">Certifications ({{ certifications_count|default:"0" }})</h4>
         <button class="btn btn-success mb-3" type="button" data-bs-toggle="collapse" data-bs-target="#addCertificationForm" aria-expanded="false" aria-controls="addCertificationForm">
             Add Certification
         </button>
@@ -360,15 +351,13 @@
             </form>
         </div>
 
-        {% if certifications_count == 0 %}
+        {% if certifications_count|default:0 == 0 %}
             <p>No certifications added yet.</p>
         {% else %}
             <ul>
                 {% for cert in profile.certifications.all %}
-                    <li>{{ cert.name }} - {{ cert.organization }} ({{ cert.date_obtained }}) 
-                        {% if cert.certificate_url %}
-                            (<a href="{{ cert.certificate_url }}" target="_blank">Certificate</a>)
-                        {% endif %}
+                    <li>{{ cert.name|default_if_none:'' }} - {{ cert.organization|default_if_none:'' }} ({{ cert.date_obtained|default_if_none:'' }}) 
+                        {% if cert.certificate_url %}(<a href="{{ cert.certificate_url }}" target="_blank">Certificate</a>){% endif %}
                     </li>
                 {% endfor %}
             </ul>
